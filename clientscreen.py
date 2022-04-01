@@ -1,13 +1,16 @@
 import pygame
 from client import Client
-from TicTacToe.tictactoe_gui import TicTacToe
+from Games.TicTacToe.tictactoe_gui import TicTacToe
+from dashboard import Dashboard
 
-window = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+WIDTH = 1400
+HEIGHT = 900
+
+window = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 pygame.font.init()
 
-with open('nothing.txt') as data: nstring = data.read().strip()
-
+dashboard = Dashboard(window,clock)
 tictactoe = TicTacToe(window,clock)
 
 client = Client()
