@@ -1,5 +1,5 @@
 import pygame
-
+import shape
 class Dashboard:
     def __init__(self, window, clock):
         self.window = window
@@ -10,6 +10,8 @@ class Dashboard:
 
         self.bgColor = (231, 173, 153)
         self.navColor = (40, 0, 3)
+
+        self.drawables = []
 
         while self.run:
             for event in pygame.event.get():
@@ -22,4 +24,6 @@ class Dashboard:
         pygame.draw.rect(self.window, self.navColor, (0, 0, 1400, 100))
         pygame.display.update()
         
+    def loadDrawables(self):
+        self.drawables.append(shape.Rectangle())
     
