@@ -42,10 +42,10 @@ class Connect4:
 
         while self.run:
             if len(self.client.recievingQueue) != 0:
-                self.placePiece(self.client.recievingQueue[0][1])
-                self.player = self.nextTurn(self.player, 7-(7-len(self.cols[self.client.recievingQueue[0][1]])), self.client.recievingQueue[0][1])
+                self.placePiece(int(self.client.recievingQueue[0][1]))
+                self.player = self.nextTurn(self.player, 7-(7-len(self.cols[int(self.client.recievingQueue[0][1])])), int(self.client.recievingQueue[0][1]))
                 print((self.client.recievingQueue[0][0], self.client.recievingQueue[0][1]))
-                if self.checkWin(7-(7-len(self.cols[self.client.recievingQueue[0][1]])), self.client.recievingQueue[0][1]):
+                if self.checkWin(7-(7-len(self.cols[int(self.client.recievingQueue[0][1])])), int(self.client.recievingQueue[0][1])):
                     print('Player 1 Won' if self.player == 2 else 'Player 2 Won')
                     self.run = False
                 del self.client.recievingQueue[0]
@@ -119,7 +119,7 @@ class Connect4:
         return(not player)
     
     def placePiece(self, col):
-
+        col = int(col)
         self.row = len(self.cols[col])
         if not self.player:
             self.cols[col][0].color = (255,0,0)
@@ -249,12 +249,3 @@ class Connect4:
                 return [True, True]
 
         return False
-        
-WIDTH = 1000
-HEIGHT = 700
-
-window = pygame.display.set_mode((WIDTH, HEIGHT))
-clock = pygame.time.Clock()
-pygame.font.init()
-
-Connect4(window, clock)
