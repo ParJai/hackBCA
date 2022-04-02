@@ -49,7 +49,7 @@ class Connect4:
     def draw(self):
         mx, my = pygame.mouse.get_pos()
         self.window.fill((231, 173, 153))
-        pygame.draw.rect(self.window, (0,0,255), (150, 100, 700, 600))
+        pygame.draw.rect(self.window, (0,0,255), (150, 0, 700, 600))
         for i in self.circles: i.draw()
         if 200 < mx < 800:
             if self.prevcol != (mx-150)//100:
@@ -71,7 +71,7 @@ class Connect4:
         row = 0
         for x in range(200, 851, 100):
             tempcol = []
-            for y in range(150, 701, 100):
+            for y in range(50, 601, 100):
                 circ = circle(x, y, self.window)
                 self.circles.append(circ)
                 self.cir[f'{col},{row}'] = circ
