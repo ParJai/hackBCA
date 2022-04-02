@@ -47,7 +47,7 @@ class Dashboard:
         self.colors = [(255,0,0),(255,0,255),(0,0,255),(0,0,255),(255,0,255), (255,0,0)]
         self.images = {}
         self.games = []
-        self.gameList = ['agm', 'bts', 'bj', 'c4', 'nim', 'ttt']
+        self.gameList = ['agm', 'bts', '', 'c4', 'nim', 'ttt']
         self.dest = ""
         # self.images[self.gameNames[i]]
         for i in range(6):
