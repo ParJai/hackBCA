@@ -135,6 +135,7 @@ def handle_client(conn, addr):
                         for client_socket in gameList:
                             if client_socket != conn:
                                 try:
+                                    print('Receive message maybe')
                                     clients[client_socket].append(f"{game['header']:<{HEADER}}:{game['data']}:{msg_len:<{HEADER}}:{msg}")
                                     split_msg = clients[client_socket][0].split(":")
                                     client_socket.send(split_msg[0].encode(FORMAT))

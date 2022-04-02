@@ -1,4 +1,3 @@
-
 import pygame
 import threading
 
@@ -20,13 +19,13 @@ class Button:
         self.y = y
         self.size = size
         self.text = text
-    
+
     def draw(self):
         mx, my = pygame.mouse.get_pos()
         pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
         write(self.window, self.text, 'tahoma.ttf', 40, ((self.x + (self.size[0] / 2), self.y + (self.size[1] / 2))), (0, 0, 0))
         if self.x <= pygame.mouse.get_pos()[0] <= self.x + self.size[0] and self.y <= pygame.mouse.get_pos()[1] <= self.y + self.size[1]:
-            pygame.draw.rect(self.window, (255, 255, 255), ((self.x - 5), (self.y - 5), self.size[0] + 10, self.size[1] + 10), 4)
+            pygame.draw.rect(self.window, (255, 255, 255), ((self.x - 5), (self.y - 5), self.size[0] + 5, self.size[1] + 5), 4)
 
 
 class Stone:
@@ -35,10 +34,10 @@ class Stone:
         self.row = row
         self.x, self.y = x, y
         self.size = size
-    
+
     def draw(self):
         pygame.draw.circle(self.window, (255, 255, 255), (self.x, self.y), self.size)
-    
+
 class Nim:
     def __init__(self, window, clock, client):
         self.window = window
@@ -57,7 +56,11 @@ class Nim:
         self.bgColor = (74, 111, 165)
         margin = 40
 
-        self.player = int(self.client.recievingQueue[0][1])
+        msg = ""
+        sending = threading.Thread(target = self.client.send_message, args = (msg,), daemon = True)
+        sending.start()
+        recieving = threading.Thread(target = self.client.recieve_message, args = (), daemon = True)
+        recieving.start()
 
         for row in range(len(self.board)):
             self.stones.append([])
@@ -75,20 +78,20 @@ class Nim:
                     x = self.stones[-1][-1].x + margin + (size * 2)
                 self.stones[-1].append(Stone(self.window, row + 1, x, y, size))
 
-        msg = ""
-        sending = threading.Thread(target = self.client.send_message, args = (msg,), daemon = True)
-        sending.start()
-        recieving = threading.Thread(target = self.client.recieve_message, args = (), daemon = True)
-        recieving.start()
-
         while self.run:
+            if len(self.client.recievingQueue) != 0:
+                self.updateBoard(self.client.recievingQueue[0][1].split(";")[0],self.client.recievingQueue[0][1].split(";")[1] )
+                print((self.client.recievingQueue[0][0], self.client.recievingQueue[0][1]))
+                del self.client.recievingQueue[0]
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    self.mouse_pos = pygame.mouse.get_pos()
+                    if self.turn: self.mouse_pos = pygame.mouse.get_pos()
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouse_pos = ()
+            
             self.draw()
             self.checkWin(self.stones)
             if self.checkSubmitClick(self.submitTurnButton):
@@ -97,23 +100,18 @@ class Nim:
                 self.rowSelected, self.removed = 10, 0
                 self.turn = False
 
-    
     def draw(self):
         self.window.fill(self.bgColor)
         for row in self.stones:
             for stone in row:
                 stone.draw()
-            print(self.rowSelected)
             if self.turn:
                 if self.rowSelected == 10:
                     self.checkStoneClick(row)
-                    self.rowSelected = self.stones.index(row)
                 else:
                     if self.rowSelected == self.stones.index(row):
                         self.checkStoneClick(row)
-            
-            self.submitTurnButton.draw()
-            
+        self.submitTurnButton.draw()
         pygame.display.update()
 
     def checkStoneClick(self, row):
@@ -121,7 +119,7 @@ class Nim:
             self.removeStone(self.stones, self.stones.index(row))
             self.rowSelected = self.stones.index(row)
             self.mouse_pos = ()
-    
+
     def checkSubmitClick(self, button):
         if self.mouse_pos and button.x <= self.mouse_pos[0] <= button.x + button.size[0] and button.y <= self.mouse_pos[1] <= button.y + button.size[1]:
             self.mouse_pos = ()
@@ -132,6 +130,13 @@ class Nim:
         stones[row].pop(-1)
         self.removed += 1
     
+    def updateBoard(self, row, removed):
+        row = int(row)
+        removed = int(removed)
+        for i in range(removed):
+            self.stones[row].pop(-1)
+        self.turn = True
+
     def checkWin(self, stones):
         total = 0
         for row in stones:
