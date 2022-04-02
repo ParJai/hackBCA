@@ -13,6 +13,7 @@ server_socket.bind(ADDR)
 sockets_list = [server_socket]
 clients = {}
 userList = []
+sockets = []
 
 games = {'ttt': 2, 'c4': 2, 'agm': 2, 'bts' : 2, 'bj': 4, 'nim': 2}
 tttGames, tempTTTgame = [['tempgame']], []
@@ -94,6 +95,9 @@ def handle_client(conn, addr):
 
     print(f"[NEW CONNECTION] {addr} connected.")
 
+    sockets.append(conn)
+    print(sockets)
+
     try:
         msg_len = conn.recv(HEADER)
         message_length = msg_len.decode(FORMAT)
@@ -104,16 +108,20 @@ def handle_client(conn, addr):
         print('unable to get username')
     
     gameList = checkValidGame(game['data'], conn)
-    
-    message = msg.encode(FORMAT)
-    msg_length = len(message)
-    send_length = str(msg_length).encode(FORMAT)
-    send_length += b' ' * (HEADER - len(send_length))
-    client_socket.send(send_length)
-    if len(gameList) == 1:
-        conn.send("1")
-    else:
-        conn.send("2")
+    # msg = ''
+    # message = msg.encode(FORMAT)
+    # msg_length = len(message)
+    # send_length = str(msg_length).encode(FORMAT)
+    # send_length += b' ' * (HEADER - len(send_length))
+    # conn.send(send_length)
+    # if len(gameList) == 1:
+    #     conn.send("1".encode(FORMAT))
+    #     conn.send("1".encode(FORMAT))
+    #     print('1')
+    # else:
+    #     conn.send("2".encode(FORMAT))
+    #     conn.send("2".encode(FORMAT))
+    #     print('2')
     
     sockets_list.append(conn)
     ignoreDisconnected = []
@@ -128,9 +136,10 @@ def handle_client(conn, addr):
                     if msg != "": 
                         print(msg, "message")
                         print(gameList)
-                        for client_socket in gameList:
+                        for client_socket in sockets:
                             if client_socket != conn:
                                 try:
+                                    print('Receive message maybe')
                                     clients[client_socket].append(f"{game['header']:<{HEADER}}:{game['data']}:{msg_len:<{HEADER}}:{msg}")
                                     split_msg = clients[client_socket][0].split(":")
                                     client_socket.send(split_msg[0].encode(FORMAT))
@@ -139,7 +148,9 @@ def handle_client(conn, addr):
                                     client_socket.send(''.join(split_msg[3:]).encode(FORMAT))
                                     del clients[client_socket][0]
                                 except:
+                                    print('error')
                                     ignoreDisconnected.append(client_socket)
+
                         for discon in ignoreDisconnected:
                             del clients[discon]
                         ignoreDisconnected = []

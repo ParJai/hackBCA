@@ -34,7 +34,7 @@ class Client():
                 send_length += b' ' * (self.HEADER - len(send_length))
                 self.client_socket.send(send_length)
                 self.client_socket.send(message)
-    
+
     def recieve_message(self):
         while True:
             try:
@@ -60,4 +60,3 @@ class Client():
                     self.userList = userList[0:]
             except:
                 pass
-        

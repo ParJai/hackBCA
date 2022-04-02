@@ -25,7 +25,7 @@ class Button:
         pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
         write(self.window, self.text, 'tahoma.ttf', 40, ((self.x + (self.size[0] / 2), self.y + (self.size[1] / 2))), (0, 0, 0))
         if self.x <= pygame.mouse.get_pos()[0] <= self.x + self.size[0] and self.y <= pygame.mouse.get_pos()[1] <= self.y + self.size[1]:
-            pygame.draw.rect(self.window, (255, 255, 255), ((self.x - 5), (self.y - 5), self.size[0] + 5, self.size[1] + 5), 4)
+            pygame.draw.rect(self.window, (255, 255, 255), ((self.x - 5), (self.y - 5), self.size[0] + 10, self.size[1] + 10), 4)
 
 
 class Stone:
@@ -95,7 +95,7 @@ class Nim:
             self.draw()
             self.checkWin(self.stones)
             if self.checkSubmitClick(self.submitTurnButton):
-                # print(self.checkWin(self.stones))
+                print()
                 self.client.messageQueue.append(f'{self.rowSelected};{self.removed}')
                 self.rowSelected, self.removed = 10, 0
                 self.turn = False
@@ -121,9 +121,10 @@ class Nim:
             self.mouse_pos = ()
 
     def checkSubmitClick(self, button):
-        if self.mouse_pos and button.x <= self.mouse_pos[0] <= button.x + button.size[0] and button.y <= self.mouse_pos[1] <= button.y + button.size[1]:
-            self.mouse_pos = ()
-            return True
+        if self.rowSelected != 10:
+            if self.mouse_pos and button.x <= self.mouse_pos[0] <= button.x + button.size[0] and button.y <= self.mouse_pos[1] <= button.y + button.size[1]:
+                self.mouse_pos = ()
+                return True
         return False
 
     def removeStone(self, stones, row):
@@ -142,3 +143,10 @@ class Nim:
         for row in stones:
             total += len(row)
         return total == 0
+
+    def winScreen(self):
+        self.turn = False
+        write(self.window, 'YOU WON', 'tahoma.ttf', 40, 500, 300, ((0, 255, 0)))
+    
+    def loseScreen(self):
+        self.turn = False
