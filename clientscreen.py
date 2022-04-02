@@ -3,10 +3,10 @@ from client import Client
 from Games.TicTacToe.tictactoe_gui import TicTacToe
 from dashboard import Dashboard
 
-WIDTH = 1400
-HEIGHT = 900
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 700
 
-window = pygame.display.set_mode((WIDTH, HEIGHT))
+window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 pygame.font.init()
 
