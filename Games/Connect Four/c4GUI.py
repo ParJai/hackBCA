@@ -36,12 +36,12 @@ class Connect4:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = pygame.mouse.get_pos()
                     if 200 < mx < 800:
-                        if self.cols[(mx-200)//100] != []:
+                        if self.cols[(mx-150)//100] != []:
                             print("\n".join([", ".join(i) for i in self.field]))
-                            self.placePiece((mx-200)//100)
-                            self.player = self.nextTurn(self.player, 7-(7-len(self.cols[(mx-200)//100])), (mx-200)//100)
-                            print(self.checkWin(7-(7-len(self.cols[(mx-200)//100])), (mx-200)//100))
-                            if self.checkWin(7-(7-len(self.cols[(mx-200)//100])), (mx-200)//100):
+                            self.placePiece((mx-150)//100)
+                            self.player = self.nextTurn(self.player, 7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100)
+                            print(self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100))
+                            if self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100):
                                 print('Player 1 Won' if self.player == 2 else 'Player 2 Won')
                                 self.run = False
             self.draw()
@@ -49,16 +49,16 @@ class Connect4:
     def draw(self):
         mx, my = pygame.mouse.get_pos()
         self.window.fill((231, 173, 153))
-        pygame.draw.rect(self.window, (0,0,255), (200, 0, 600, 700))
+        pygame.draw.rect(self.window, (0,0,255), (150, 100, 700, 600))
         for i in self.circles: i.draw()
         if 200 < mx < 800:
-            if self.prevcol != (mx-200)//100:
-                for i in self.cols[(mx-200)//100]:
+            if self.prevcol != (mx-150)//100:
+                for i in self.cols[(mx-150)//100]:
                     i.color = (29, 94, 173)
                 if self.prevcol != -1:
                     for i in self.cols[self.prevcol]:
                         i.color = (12, 50, 97)
-                self.prevcol = (mx-200)//100
+                self.prevcol = (mx-150)//100
         else:
             if self.prevcol != -1:
                 for i in self.cols[self.prevcol]:
@@ -69,9 +69,9 @@ class Connect4:
     def loadCircles(self):
         col = 0
         row = 0
-        for x in range(250, 800, 100):
+        for x in range(200, 851, 100):
             tempcol = []
-            for y in range(50, 700, 100):
+            for y in range(150, 701, 100):
                 circ = circle(x, y, self.window)
                 self.circles.append(circ)
                 self.cir[f'{col},{row}'] = circ
