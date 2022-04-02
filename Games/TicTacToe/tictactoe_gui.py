@@ -751,6 +751,75 @@ class TicTacToe():
                             check_win()
                             print(move)
                             self.client.messageQueue.append(str(move))
+                            if len(self.client.recievingQueue) != 0:
+                                print(self.client.recievingQueue[0])
+                                if not tie and not win:
+                                    computerMove = int(self.client.recievingQueue[0][1])
+                                    if computerMove == 0:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_1.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(0, computerPiece)
+                                        one = computerPiece
+                                        one_filled = True
+                                        turn += 1
+                                    elif computerMove == 1:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_2.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(1, computerPiece)
+                                        two = computerPiece
+                                        two_filled = True
+                                        turn += 1
+                                    elif computerMove == 2:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_3.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(2, computerPiece)
+                                        three = computerPiece
+                                        three_filled = True
+                                        turn += 1
+                                    elif computerMove == 3:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_4.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(3, computerPiece)
+                                        four = computerPiece
+                                        four_filled = True
+                                        turn += 1
+                                    elif computerMove == 4:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_5.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(4, computerPiece)
+                                        five = computerPiece
+                                        five_filled = True
+                                        turn += 1
+                                    elif computerMove == 5:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_6.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(5, computerPiece)
+                                        six = computerPiece
+                                        six_filled = True
+                                        turn += 1
+                                    elif computerMove == 6:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_7.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(6, computerPiece)
+                                        seven = computerPiece
+                                        seven_filled = True
+                                        turn += 1
+                                    elif computerMove == 7:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_8.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(7, computerPiece)
+                                        eight = computerPiece
+                                        eight_filled = True
+                                        turn += 1
+                                    elif computerMove == 8:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_9.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(8, computerPiece)
+                                        nine = computerPiece
+                                        nine_filled = True
+                                        turn += 1
+                                click_pos = (0, 0)
+                                del self.client.recievingQueue[0]
                 pygame.display.flip()
                 check_win()
 
