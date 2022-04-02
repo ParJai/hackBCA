@@ -45,8 +45,7 @@ class Battleship:
 
         pygame.display.update()
 
-    def genBoxs(self):
-        for x in range(0, 600, 71)
+    
 
 WIDTH = 1000
 HEIGHT = 700
