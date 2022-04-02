@@ -2,6 +2,8 @@
 import pygame     
 import os
 
+pygame.init()
+
 def write(screen, text, font, text_size, center, color):
     text_font = pygame.font.Font(font, text_size)
     text_to_write = text_font.render(text, True, color)
