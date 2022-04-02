@@ -42,7 +42,7 @@ class Board:
             n_2 += n_2_inc
         return diagonals
     
-    def checkSubset(self, listOfLists: list) -> str | int:
+    def checkSubset(self, listOfLists: list):
         same = True
         checkChar = ""
         for i in listOfLists:
@@ -59,7 +59,7 @@ class Board:
         
         return 0
     
-    def checkBoard(self) -> str | int:
+    def checkBoard(self):
         rowsChar = self.checkSubset(self.getRows())
         columnsChar = self.checkSubset(self.getColumns())
         diagonalsChar = self.checkSubset(self.getDiagonals())
