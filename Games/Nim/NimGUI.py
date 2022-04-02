@@ -24,7 +24,7 @@ class Button:
     def draw(self):
         pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
         write(self.window, self.text, 'tahoma.ttf', 40, ((self.x + (self.size[0] / 2), self.y + (self.size[1] / 2))), (0, 0, 0))
-        if self.x <= pygame.mouse.get_pos() <= self.x + self.size[0] and self.y <= pygame.mouse.get_pos() <= self.y + self.size[1]:
+        if self.x <= pygame.mouse.get_pos()[0] <= self.x + self.size[0] and self.y <= pygame.mouse.get_pos()[1] <= self.y + self.size[1]:
             pygame.draw.rect(self.window, (255, 255, 255), ((self.x - 5), (self.y - 5), self.size[0] + 5, self.size[1] + 5), 4)
 
 
@@ -47,7 +47,7 @@ class Nim:
 
         self.board = board
         self.stones = []
-        self.rowSelected = 0
+        self.rowSelected = 10
         self.removed = 0
         self.submitTurnButton = Button(self.window, 410, 590, (180, 80), 'SUBMIT')
         self.run = True
@@ -90,14 +90,15 @@ class Nim:
             if self.checkSubmitClick(self.submitTurnButton):
                 # print(self.checkWin(self.stones))
                 self.client.messageQueue.append(f'{self.rowSelected};{self.removed}')
-                self.rowSelected, self.removed = 0, 0
+                self.rowSelected, self.removed = 10, 0
     
     def draw(self):
         self.window.fill(self.bgColor)
         for row in self.stones:
             for stone in row:
                 stone.draw()
-            if self.rowSelected != 0:
+            print(self.rowSelected)
+            if self.rowSelected == 10:
                 self.checkStoneClick(row)
             else:
                 if self.rowSelected == self.stones.index(row):
@@ -108,6 +109,7 @@ class Nim:
     def checkStoneClick(self, row):
         if self.mouse_pos and (len(row) != 0) and (row[0].x - row[0].size) <= self.mouse_pos[0] <= (row[-1].x + row[0].size) and (row[0].y - row[0].size) <= self.mouse_pos[1] <= (row[-1].y + row[0].size):
             self.removeStone(self.stones, self.stones.index(row))
+            self.rowSelected = self.stones.index(row)
             self.mouse_pos = ()
     
     def checkSubmitClick(self, button):
