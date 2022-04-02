@@ -28,6 +28,8 @@ class Connect4:
 
         self.prevcol = -1
 
+        self.turn = True
+
         self.field = [["O" for i in range(8)] for j in range(9)]
         self.player = self.newGame()
 
@@ -45,6 +47,7 @@ class Connect4:
                 self.placePiece(int(self.client.recievingQueue[0][1]))
                 self.player = self.nextTurn(self.player, 7-(7-len(self.cols[int(self.client.recievingQueue[0][1])])), int(self.client.recievingQueue[0][1]))
                 print((self.client.recievingQueue[0][0], self.client.recievingQueue[0][1]))
+                self.turn = True
                 if self.checkWin(7-(7-len(self.cols[int(self.client.recievingQueue[0][1])])), int(self.client.recievingQueue[0][1])):
                     print('Player 1 Won' if self.player == 2 else 'Player 2 Won')
                     self.run = False
@@ -55,15 +58,17 @@ class Connect4:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = pygame.mouse.get_pos()
                     if 200 < mx < 800:
-                        if self.cols[(mx-150)//100] != []:
-                            print("\n".join([", ".join(i) for i in self.field]))
-                            self.placePiece((mx-150)//100)
-                            self.client.messageQueue.append(str((mx-150)//100))
-                            self.player = self.nextTurn(self.player, (mx-150)//100, len(self.cols[(mx-150)//100]))
-                            print(self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100))
-                            if self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100):
-                                print('Player 2 Won' if self.player == False else 'Player 1 Won')
-                                self.run = False
+                        if self.turn:
+                            if self.cols[(mx-150)//100] != []:
+                                print("\n".join([", ".join(i) for i in self.field]))
+                                self.placePiece((mx-150)//100)
+                                self.client.messageQueue.append(str((mx-150)//100))
+                                self.player = self.nextTurn(self.player, (mx-150)//100, len(self.cols[(mx-150)//100]))
+                                self.turn = False
+                                print(self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100))
+                                if self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100):
+                                    print('Player 2 Won' if self.player == False else 'Player 1 Won')
+                                    self.run = False
             self.draw()
     
     def draw(self):
