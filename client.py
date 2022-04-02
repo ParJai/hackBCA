@@ -50,8 +50,8 @@ class Client():
                     message_length = int(message_header.strip())
                     print('5')
                     message = self.client_socket.recv(message_length).decode(self.FORMAT)
-                    print(message)
-                    self.recievingQueue.append([username, message])
+                    if username == self.game:
+                        self.recievingQueue.append([username, message])
                 else:
                     print('10')
                     userListLen = int(username_header.split()[1].strip())
