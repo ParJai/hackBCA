@@ -935,7 +935,7 @@ class TicTacToe():
             if len(self.client.recievingQueue) != 0:
                 print(self.client.recievingQueue[0])
                 if not tie and not win:
-                    computerMove = self.client.recievingQueue[0][1]
+                    computerMove = int(self.client.recievingQueue[0][1])
                     if computerMove == 0:
                         to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_1.center, red))
                         computerPiece = "X" if player_1 == "O" else "O"
