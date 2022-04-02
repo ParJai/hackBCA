@@ -45,8 +45,9 @@ class anagrams:
            
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:
-                        appear[user_text[-1]] -= 1
-                        user_text = user_text[:-1]
+                        if (len(user_text) != 0):
+                            appear[user_text[-1]] -= 1
+                            user_text = user_text[:-1]
                     
                     else:
                         prev = len(user_text)
