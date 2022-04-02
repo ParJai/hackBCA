@@ -749,7 +749,9 @@ class TicTacToe():
                             click_pos = (0, 0)
                             check_win()
                             self.client.messageQueue.append(str(move))
+                            print(move)
                             if len(self.client.recievingQueue) != 0:
+                                print(self.client.recievingQueue[0])
                                 if not tie and not win:
                                     computerMove = self.client.recievingQueue[0][1]
                                     if computerMove == 0:
