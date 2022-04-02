@@ -20,6 +20,6 @@ dashboard = Dashboard(window, clock)
 client = Client(dashboard.dest)
 print(dashboard.dest)
 print('connected')
-tempclient = Connect4(window, clock, client)
+tempclient = TicTacToe(window, clock, client)
 
 pygame.display.quit()
