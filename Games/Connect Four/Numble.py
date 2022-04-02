@@ -13,6 +13,7 @@ HEIGHT = 700
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 pygame.font.init()
+#wadsas
 
 numble(window, clock)
         
