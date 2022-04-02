@@ -5,7 +5,7 @@ from dashboard import Dashboard
 from tempclient import TempClient
 from Games.Nim.NimGUI import Nim
 from Games.TicTacToe.tictactoe_gui import *
-# from Games.Anagrams.anagrams import anagrams
+from Games.Anagrams.anagrams import anagrams
 from Games.Connect_Four.c4GUI import Connect4
 
 SCREEN_WIDTH = 1000
@@ -18,7 +18,7 @@ dashboard = Dashboard(window, clock)
 while dashboard.dest != "":
     client = Client(dashboard.dest)
     if dashboard.dest == 'agm':
-        tempclient = TicTacToe(window, clock, client)
+        tempclient = anagrams(window, clock, client)
     elif dashboard.dest == 'ttt':
         tempclient = TicTacToe(window, clock, client)
     elif dashboard.dest == 'bj':
