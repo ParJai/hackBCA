@@ -18,7 +18,7 @@ dashboard = Dashboard(window, clock)
 while dashboard.dest != "":
     client = Client(dashboard.dest)
     if dashboard.dest == 'agm':
-        tempclient = anagrams(window, clock, client)
+        tempclient = anagrams(window, clock)
     elif dashboard.dest == 'ttt':
         tempclient = TicTacToe(window, clock, client)
     elif dashboard.dest == 'bj':
