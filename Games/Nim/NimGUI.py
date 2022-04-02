@@ -22,9 +22,10 @@ class Button:
         self.text = text
     
     def draw(self):
+        mx, my = pygame.mouse.get_pos()
         pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
         write(self.window, self.text, 'tahoma.ttf', 40, ((self.x + (self.size[0] / 2), self.y + (self.size[1] / 2))), (0, 0, 0))
-        if self.x <= pygame.mouse.get_pos() <= self.x + self.size[0] and self.y <= pygame.mouse.get_pos() <= self.y + self.size[1]:
+        if self.x <= mx <= self.x + self.size[0] and self.y <= my <= self.y + self.size[1]:
             pygame.draw.rect(self.window, (255, 255, 255), ((self.x - 5), (self.y - 5), self.size[0] + 5, self.size[1] + 5), 4)
 
 
