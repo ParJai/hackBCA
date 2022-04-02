@@ -1,5 +1,5 @@
 import pygame
-
+import threading
 class circle:
     def __init__(self, x, y, window):
         self.x=x
@@ -10,10 +10,12 @@ class circle:
     def draw(self):
         pygame.draw.circle(self.winodw, self.color, (self.x, self.y), 30)
 class Connect4:
-    def __init__(self, window, clock):
+    def __init__(self, window, clock, client):
         self.window = window
 
         self.clock = clock
+
+        self.client = client
 
         self.run = True
         
@@ -29,7 +31,22 @@ class Connect4:
         self.player = self.newGame()
 
         self.loadCircles()
+
+        msg = ""
+        sending = threading.Thread(target = self.client.send_message, args = (msg,), daemon = True)
+        sending.start()
+        recieving = threading.Thread(target = self.client.recieve_message, args = (), daemon = True)
+        recieving.start()
+
         while self.run:
+            if len(self.client.recievingQueue) != 0:
+                self.placePiece(self.client.recievingQueue[0][1])
+                self.player = self.nextTurn(self.player, 7-(7-len(self.cols[self.client.recievingQueue[0][1]])), self.client.recievingQueue[0][1])
+                print((self.client.recievingQueue[0][0], self.client.recievingQueue[0][1]))
+                if self.checkWin(7-(7-len(self.cols[self.client.recievingQueue[0][1]])), self.client.recievingQueue[0][1]):
+                    print('Player 1 Won' if self.player == 2 else 'Player 2 Won')
+                    self.run = False
+                del self.client.recievingQueue[0]
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
@@ -40,6 +57,7 @@ class Connect4:
                             print("\n".join([", ".join(i) for i in self.field]))
                             self.placePiece((mx-200)//100)
                             self.player = self.nextTurn(self.player, 7-(7-len(self.cols[(mx-200)//100])), (mx-200)//100)
+                            self.client.messageQueue.append(str((mx-200)//100))
                             print(self.checkWin(7-(7-len(self.cols[(mx-200)//100])), (mx-200)//100))
                             if self.checkWin(7-(7-len(self.cols[(mx-200)//100])), (mx-200)//100):
                                 print('Player 1 Won' if self.player == 2 else 'Player 2 Won')

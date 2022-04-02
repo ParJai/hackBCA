@@ -1,4 +1,5 @@
 import pygame
+import threading
 
 class circle:
     def __init__(self, x, y, window):
@@ -10,12 +11,14 @@ class circle:
     def draw(self):
         pygame.draw.circle(self.window, self.color, (self.x, self.y), 30)
 class Connect4:
-    def __init__(self, window, clock):
+    def __init__(self, window, clock, client):
         self.window = window
 
         self.clock = clock
 
         self.run = True
+
+        self.client = client
         
         self.circles = []
         self.cir = {}
@@ -30,7 +33,22 @@ class Connect4:
 
         self.loadCircles()
         
+       
+        msg = ""
+        sending = threading.Thread(target = self.client.send_message, args = (msg,), daemon = True)
+        sending.start()
+        recieving = threading.Thread(target = self.client.recieve_message, args = (), daemon = True)
+        recieving.start()
+
         while self.run:
+            if len(self.client.recievingQueue) != 0:
+                self.placePiece(int(self.client.recievingQueue[0][1]))
+                self.player = self.nextTurn(self.player, 7-(7-len(self.cols[int(self.client.recievingQueue[0][1])])), int(self.client.recievingQueue[0][1]))
+                print((self.client.recievingQueue[0][0], self.client.recievingQueue[0][1]))
+                if self.checkWin(7-(7-len(self.cols[int(self.client.recievingQueue[0][1])])), int(self.client.recievingQueue[0][1])):
+                    print('Player 1 Won' if self.player == 2 else 'Player 2 Won')
+                    self.run = False
+                del self.client.recievingQueue[0]
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
@@ -40,6 +58,7 @@ class Connect4:
                         if self.cols[(mx-150)//100] != []:
                             print("\n".join([", ".join(i) for i in self.field]))
                             self.placePiece((mx-150)//100)
+                            self.client.messageQueue.append(str((mx-150)//100))
                             self.player = self.nextTurn(self.player, (mx-150)//100, len(self.cols[(mx-150)//100]))
                             print(self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100))
                             if self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100):
@@ -100,7 +119,7 @@ class Connect4:
         return(not player)
     
     def placePiece(self, col):
-
+        col = int(col)
         self.row = len(self.cols[col])
         if not self.player:
             self.cols[col][0].color = (255,0,0)
@@ -230,12 +249,3 @@ class Connect4:
                 return [True, True]
 
         return False
-        
-WIDTH = 1000
-HEIGHT = 700
-
-window = pygame.display.set_mode((WIDTH, HEIGHT))
-clock = pygame.time.Clock()
-pygame.font.init()
-
-Connect4(window, clock)
