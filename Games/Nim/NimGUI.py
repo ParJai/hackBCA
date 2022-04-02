@@ -43,7 +43,7 @@ class Nim:
     def __init__(self, window, clock, client):
         self.window = window
         self.clock = clock
-        self.mouse_pos = ()
+        self.mouse_pos = (0, 0)
         self.client = client
 
         self.board = board
@@ -52,6 +52,7 @@ class Nim:
         self.removed = 0
         self.submitTurnButton = Button(self.window, 410, 590, (180, 80), 'SUBMIT')
         self.run = True
+        self.turn = True
 
         self.bgColor = (74, 111, 165)
         margin = 40
@@ -94,6 +95,8 @@ class Nim:
                 # print(self.checkWin(self.stones))
                 self.client.messageQueue.append(f'{self.rowSelected};{self.removed}')
                 self.rowSelected, self.removed = 10, 0
+                self.turn = False
+
     
     def draw(self):
         self.window.fill(self.bgColor)
@@ -101,13 +104,15 @@ class Nim:
             for stone in row:
                 stone.draw()
             print(self.rowSelected)
-            if self.rowSelected == 10:
-                self.checkStoneClick(row)
-                self.rowSelected = self.stones.index(row)
-            else:
-                if self.rowSelected == self.stones.index(row):
+            if self.turn:
+                if self.rowSelected == 10:
                     self.checkStoneClick(row)
-        self.submitTurnButton.draw()
+                    self.rowSelected = self.stones.index(row)
+                else:
+                    if self.rowSelected == self.stones.index(row):
+                        self.checkStoneClick(row)
+            self.submitTurnButton.draw()
+            
         pygame.display.update()
 
     def checkStoneClick(self, row):

@@ -104,16 +104,20 @@ def handle_client(conn, addr):
         print('unable to get username')
     
     gameList = checkValidGame(game['data'], conn)
-    
-    message = msg.encode(FORMAT)
-    msg_length = len(message)
-    send_length = str(msg_length).encode(FORMAT)
-    send_length += b' ' * (HEADER - len(send_length))
-    client_socket.send(send_length)
-    if len(gameList) == 1:
-        client_socket.send("1")
-    else:
-        client_socket.send("2")
+    # msg = ''
+    # message = msg.encode(FORMAT)
+    # msg_length = len(message)
+    # send_length = str(msg_length).encode(FORMAT)
+    # send_length += b' ' * (HEADER - len(send_length))
+    # conn.send(send_length)
+    # if len(gameList) == 1:
+    #     conn.send("1".encode(FORMAT))
+    #     conn.send("1".encode(FORMAT))
+    #     print('1')
+    # else:
+    #     conn.send("2".encode(FORMAT))
+    #     conn.send("2".encode(FORMAT))
+    #     print('2')
     
     sockets_list.append(conn)
     ignoreDisconnected = []
