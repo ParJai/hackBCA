@@ -5,9 +5,9 @@ import sys
 
 import time
 print(sys.path[0])
-f = open(sys.path[0] + "\\words.txt", 'r')
+f = open(sys.path[0] + "\\Games\\Anagrams\\words.txt", 'r')
 WORDLIST = f.read().split()
-f2 = open(sys.path[0]+'\\wordsSix.txt', 'r')
+f2 = open(sys.path[0]+'\\Games\\Anagrams\\wordsSix.txt', 'r')
 SIXLIST = f2.read().split()
 
 class anagrams:
@@ -233,25 +233,8 @@ class anagrams:
         self.write(self.window, user_text, "tahoma.ttf", 50, (500, 350), (0, 0, 0))
         self.write(self.window, f"Time: {60 - (int(time.time() - self.current))}", "tahoma.ttf", 30, (500, 650), (0, 0, 255))
         for i in range (0, 6):
-            window.blit(pygame.image.load(f'Games/Anagrams/anagramsLetters/{letters[i]}.png').convert(), (180 + i * 108, 400))
+            self.window.blit(pygame.image.load(f'Games/Anagrams/anagramsLetters/{letters[i]}.png').convert(), (180 + i * 108, 400))
 
         self.write(self.window, f"Score: {score}", "tahoma.ttf", 30, (500, 80), (0, 196, 0))
 
         pygame.display.update()
-WIDTH = 1000
-HEIGHT = 700
-
-window = pygame.display.set_mode((WIDTH, HEIGHT))
-clock = pygame.time.Clock()
-pygame.font.init()
-
-
-anagrams(window, clock)
-
-
-    
-    # Currently have to input "EXIT CODE" to end, change this to ending the loop once the 60 second timer ends
-    # Start 60 second timer once the 6 letters are sent
-
-
-f.close()
