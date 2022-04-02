@@ -1,5 +1,6 @@
 
 import pygame
+import threading
 
 pygame.init()
 
@@ -23,6 +24,8 @@ class Button:
     def draw(self):
         pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
         write(self.window, self.text, 'tahoma.ttf', 40, ((self.x + (self.size[0] / 2), self.y + (self.size[1] / 2))), (0, 0, 0))
+        if self.x <= pygame.mouse.get_pos() <= self.x + self.size[0] and self.y <= pygame.mouse.get_pos() <= self.y + self.size[1]:
+            pygame.draw.rect(self.window, (255, 255, 255), ((self.x - 5), (self.y - 5), self.size[0] + 5, self.size[1] + 5), 4)
 
 
 class Stone:
@@ -36,14 +39,16 @@ class Stone:
         pygame.draw.circle(self.window, (255, 255, 255), (self.x, self.y), self.size)
     
 class Nim:
-    def __init__(self, window, clock):
+    def __init__(self, window, clock, client):
         self.window = window
         self.clock = clock
         self.mouse_pos = ()
+        self.client = client
 
         self.board = board
         self.stones = []
         self.rowSelected = 0
+        self.removed = 0
         self.submitTurnButton = Button(self.window, 410, 590, (180, 80), 'SUBMIT')
         self.run = True
 
@@ -66,6 +71,12 @@ class Nim:
                     x = self.stones[-1][-1].x + margin + (size * 2)
                 self.stones[-1].append(Stone(self.window, row + 1, x, y, size))
 
+        msg = ""
+        sending = threading.Thread(target = self.client.send_message, args = (msg,), daemon = True)
+        sending.start()
+        recieving = threading.Thread(target = self.client.recieve_message, args = (), daemon = True)
+        recieving.start()
+
         while self.run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -77,7 +88,9 @@ class Nim:
             self.draw()
             self.checkWin(self.stones)
             if self.checkSubmitClick(self.submitTurnButton):
-                print(self.checkWin(self.stones))
+                # print(self.checkWin(self.stones))
+                self.client.messageQueue.append(f'{self.rowSelected};{self.removed}')
+                self.rowSelected, self.removed = 0, 0
     
     def draw(self):
         self.window.fill(self.bgColor)
@@ -105,6 +118,7 @@ class Nim:
 
     def removeStone(self, stones, row):
         stones[row].pop(-1)
+        self.removed += 1
     
     def checkWin(self, stones):
         total = 0
