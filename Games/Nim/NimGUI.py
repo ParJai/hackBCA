@@ -22,10 +22,8 @@ class Button:
     
     def draw(self):
         pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
-        write(self.window, self.text, 'tahoma.ttf', 30, ((self.x + (self.size[0] / 2), self.)))
+        write(self.window, self.text, 'tahoma.ttf', 40, ((self.x + (self.size[0] / 2), self.y + (self.size[1] / 2))), (0, 0, 0))
 
-    def onClick(self):
-        pass
 
 class Stone:
     def __init__(self, window, row, x, y, size):
@@ -46,7 +44,7 @@ class Nim:
         self.board = board
         self.stones = []
         self.rowSelected = 0
-        self.submitTurnButton = Button(self.window, 410, 590, (180, 80))
+        self.submitTurnButton = Button(self.window, 410, 590, (180, 80), 'SUBMIT')
         self.run = True
 
         self.bgColor = (74, 111, 165)
@@ -77,6 +75,9 @@ class Nim:
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouse_pos = ()
             self.draw()
+            self.checkWin(self.stones)
+            if self.checkSubmitClick(self.submitTurnButton):
+                print(self.checkWin(self.stones))
     
     def draw(self):
         self.window.fill(self.bgColor)
@@ -95,6 +96,18 @@ class Nim:
         if self.mouse_pos and (len(row) != 0) and (row[0].x - row[0].size) <= self.mouse_pos[0] <= (row[-1].x + row[0].size) and (row[0].y - row[0].size) <= self.mouse_pos[1] <= (row[-1].y + row[0].size):
             self.removeStone(self.stones, self.stones.index(row))
             self.mouse_pos = ()
+    
+    def checkSubmitClick(self, button):
+        if self.mouse_pos and button.x <= self.mouse_pos[0] <= button.x + button.size[0] and button.y <= self.mouse_pos[1] <= button.y + button.size[1]:
+            self.mouse_pos = ()
+            return True
+        return False
 
     def removeStone(self, stones, row):
         stones[row].pop(-1)
+    
+    def checkWin(self, stones):
+        total = 0
+        for row in stones:
+            total += len(row)
+        return total == 0
