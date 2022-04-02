@@ -22,6 +22,7 @@ class Button:
         self.text = text
     
     def draw(self):
+        mx, my = pygame.mouse.get_pos()
         pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
         write(self.window, self.text, 'tahoma.ttf', 40, ((self.x + (self.size[0] / 2), self.y + (self.size[1] / 2))), (0, 0, 0))
         if self.x <= pygame.mouse.get_pos()[0] <= self.x + self.size[0] and self.y <= pygame.mouse.get_pos()[1] <= self.y + self.size[1]:
@@ -100,6 +101,7 @@ class Nim:
             print(self.rowSelected)
             if self.rowSelected == 10:
                 self.checkStoneClick(row)
+                self.rowSelected = self.stones.index(row)
             else:
                 if self.rowSelected == self.stones.index(row):
                     self.checkStoneClick(row)
