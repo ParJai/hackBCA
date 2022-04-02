@@ -56,6 +56,8 @@ class Nim:
         self.bgColor = (74, 111, 165)
         margin = 40
 
+        self.player = int(self.client.recievingQueue[0][1])
+
         for row in range(len(self.board)):
             self.stones.append([])
             row_size = self.board[row]
