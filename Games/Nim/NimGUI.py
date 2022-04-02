@@ -48,7 +48,7 @@ class Nim:
 
         self.board = board
         self.stones = []
-        self.rowSelected = 0
+        self.rowSelected = 10
         self.removed = 0
         self.submitTurnButton = Button(self.window, 410, 590, (180, 80), 'SUBMIT')
         self.run = True
@@ -91,7 +91,7 @@ class Nim:
             if self.checkSubmitClick(self.submitTurnButton):
                 # print(self.checkWin(self.stones))
                 self.client.messageQueue.append(f'{self.rowSelected};{self.removed}')
-                self.rowSelected, self.removed = 0, 0
+                self.rowSelected, self.removed = 10, 0
     
     def draw(self):
         self.window.fill(self.bgColor)
