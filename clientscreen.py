@@ -8,7 +8,7 @@ SCREEN_HEIGHT = 700
 
 window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
-pygame.font.init()
+
 
 dashboard = Dashboard(window,clock)
 tictactoe = TicTacToe(window,clock)
