@@ -149,7 +149,7 @@ class AI:
                     return row*self.board.board_size+col
 
 class TicTacToe():
-    def __init__(self, client, window, clock):
+    def __init__(self, window, clock, client):
         self.client = client
         self.window = window
         self.clock = clock
