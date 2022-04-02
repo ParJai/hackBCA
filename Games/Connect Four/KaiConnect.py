@@ -11,7 +11,7 @@ def checkWins(col, row):
 
     var = field[col][row]
 
-    if var == "B":
+    if var == "B" or var == "O":
         return False
 
     #up direction
@@ -31,9 +31,9 @@ def checkWins(col, row):
     #check up + down
     if numUp + numDown >= 3:
         if field[col][row] == "R":
-            return [True, 0]
+            return [True, False]
         else:
-            return [True, 1]
+            return [True, True]
 
     #left direction
     for i in range(col - 1, 0, -1):
@@ -52,9 +52,9 @@ def checkWins(col, row):
     #check left + right
     if numLeft + numRight >= 3:
         if field[col][row] == "R":
-            return [True, 0]
+            return [True, False]
         else:
-            return [True, 1]
+            return [True, True]
 
 
     diagonal1TopLeft = 0
@@ -85,9 +85,9 @@ def checkWins(col, row):
     # check diagonal1
     if diagonal1TopLeft + diagonal1BottomRight >= 3:
         if field[col][row] == "R":
-            return [True, 0]
+            return [True, False]
         else:
-            return [True, 1]
+            return [True, True]
 
 
     diagonal2TopRight = 0
@@ -118,9 +118,9 @@ def checkWins(col, row):
     # check diagonal2
     if diagonal2TopRight + diagonal2BottomLeft >= 3:
         if field[col][row] == "R":
-            return [True, 0]
+            return [True, False]
         else:
-            return [True, 1]
+            return [True, True]
 
     return False
 
@@ -128,10 +128,10 @@ for col in range(1, 8):
     for row in range(1, 7):
         field[col][row] = 'B'
 
-field[4][1] = "R"
-field[5][2] = "R"
-field[6][3] = "R"
-field[7][4] = "R"
+field[4][1] = "Y"
+field[5][2] = "Y"
+field[6][3] = "Y"
+field[7][4] = "Y"
 
 print(checkWins(7, 4))
 
