@@ -3,8 +3,7 @@
 import client
 import threading
 
-field = [[]];
-
+field = [["O" for i in range(8)] for j in range(9)];
 def mPros(message):
     t1 = message.index(";");
     message = message[t1 + 1::]
@@ -12,12 +11,9 @@ def mPros(message):
     return message[t2 + 1::]
 def newGame():
     global field
-    for col in range (0, 9):
-        for row in range (0, 8):
-            if (col < 1 or col > 7 or row < 1 or row > 6):
-                field[col][row] = 'O'
-            else:
-                field[col][row] ='B'
+    for col in range (1, 8):
+        for row in range (1, 7):
+            field[col][row] ='B'
     return (False)
 
 #Check , if requested field is blank, proceed, otherwise return error. Main will recieve output from funcs in
@@ -40,6 +36,7 @@ def nextTurn(player, column, row):
 
 def checkWins(row, column):
     return False
+    #kai will semd
 
 def main():
     player = newGame()
@@ -49,17 +46,17 @@ def main():
     win = False
 
     while (not win):
-        #input
+        inPlayer, row, col = jack input
 
-        while(not inputCheck(player, y, z) or inPlayer != player):
+        while(not inputCheck(player, row, col) or inPlayer != player):
             if inPlayer != player:
                 #send not your turn message
             else:
                 #send invalid move message
             #collect new inputs
 
-        player = nextTurn(player, y, z)
-        checkWins(y, z)
+        player = nextTurn(player, row, col)
+        checkWins(row, col)
 
 
 
