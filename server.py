@@ -144,14 +144,9 @@ def handle_client(conn, addr):
                     connected = False
             except:
                 connected = False
-    
-    userList.remove(user['data'])
     del clients[conn]
     conn.close()
-    joinedUserList = ':'.join(userList)
-    for client in clients.keys():
-        client.send(f"{'userlist      '+str(len(joinedUserList)):<{HEADER}}".encode(FORMAT))
-        client.send(joinedUserList.encode(FORMAT))
+    
 def start():
     server_socket.listen(999)
     print(f"[LISTENING] Server is listening on {IP}")

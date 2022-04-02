@@ -12,13 +12,14 @@ def write(screen, text, font, text_size, center, color):
     screen.blit(text_to_write, text_rect)
 
 class GameLink:
-    def __init__(self, window, name, image, x, y, size):
+    def __init__(self, window, name, image, x, y, size, game):
         self.window = window
 
         self.name = name
         self.image = image
         self.x, self.y = x, y
         self.size = size
+        self.game = game
     
     def draw(self):
         pygame.draw.rect(self.window, (0, 0, 0), (self.x, self.y, self.size[0], self.size[1]))
@@ -35,6 +36,7 @@ class Dashboard:
         self.bgColor = (231, 173, 153)
         self.navColor = (40, 0, 3)
 
+        
         self.gameNames = os.listdir('Games')
         self.images = {}
         self.games = []
@@ -48,6 +50,8 @@ class Dashboard:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+
             self.draw()
 
     def draw(self):
