@@ -739,13 +739,14 @@ class TicTacToe():
                                             turn += 1
                                             move = 8
                                     else:
-                                        if player_1_x[turn] == 'X':
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_9.center, blue))
+                                        if player_1_x[turn] == 'O':
+                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_9.center, blue))
                                             board.addMove(8, "O")
                                             nine = 'O'
                                             nine_filled = True
                                             turn += 1
                                             move = 8
+                                    print(move)
                             click_pos = (0, 0)
                             check_win()
                             self.client.messageQueue.append(str(move))
