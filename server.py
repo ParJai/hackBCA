@@ -106,7 +106,6 @@ def handle_client(conn, addr):
     ignoreDisconnected = []
     connected = True
     while connected:
-        if len(gameList) != 0:
             try:
                 msg_len = conn.recv(HEADER).decode(FORMAT)
                 if msg_len: 
