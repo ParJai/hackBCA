@@ -39,7 +39,6 @@ class Client():
         while True:
             try:
                 username_header = self.client_socket.recv(self.HEADER).decode(self.FORMAT)
-                print('recieved')
                 if username_header.split()[0] != 'userlist':
                     print('1')
                     username_length = int(username_header.strip())
