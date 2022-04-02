@@ -11,9 +11,11 @@ clock = pygame.time.Clock()
 
 
 dashboard = Dashboard(window,clock)
-tictactoe = TicTacToe(window,clock)
 
-client = Client()
+client = Client(dashboard.dest)
+print(dashboard.dest)
+
+
 print('connected')
 
 pygame.display.quit()
