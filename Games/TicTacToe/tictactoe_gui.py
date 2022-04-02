@@ -17,10 +17,7 @@ class TicTacToe():
         red = (255, 0, 0)
         teal = (0, 128, 128)
         light_green = (124, 252, 0)
-
-        size = (1000, 700)
-        screen = pygame.display.set_mode(size)
-        pygame.display.set_caption('Tic-Tac-Toe')
+        screen = self.window
 
         x_rect = pygame.Rect((275+100, round(365*7/8)), (100, round(100*7/8)))
         o_rect = pygame.Rect((425+100, round(365*7/8)), (100, round(100*7/8)))
@@ -804,7 +801,3 @@ class TicTacToe():
                 tie_screen()
 
             pygame.display.flip()
-
-j = 0
-hi = TicTacToe(j, j, j)
-hi.runGame()
