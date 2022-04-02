@@ -13,6 +13,7 @@ server_socket.bind(ADDR)
 sockets_list = [server_socket]
 clients = {}
 userList = []
+sockets = []
 
 games = {'ttt': 2, 'c4': 2, 'agm': 2, 'bts' : 2, 'bj': 4, 'nim': 2}
 tttGames, tempTTTgame = [['tempgame']], []
@@ -94,6 +95,9 @@ def handle_client(conn, addr):
 
     print(f"[NEW CONNECTION] {addr} connected.")
 
+    sockets.append(conn)
+    print(sockets)
+
     try:
         msg_len = conn.recv(HEADER)
         message_length = msg_len.decode(FORMAT)
@@ -132,7 +136,7 @@ def handle_client(conn, addr):
                     if msg != "": 
                         print(msg, "message")
                         print(gameList)
-                        for client_socket in gameList:
+                        for client_socket in sockets:
                             if client_socket != conn:
                                 try:
                                     print('Receive message maybe')
@@ -144,7 +148,9 @@ def handle_client(conn, addr):
                                     client_socket.send(''.join(split_msg[3:]).encode(FORMAT))
                                     del clients[client_socket][0]
                                 except:
+                                    print('error')
                                     ignoreDisconnected.append(client_socket)
+
                         for discon in ignoreDisconnected:
                             del clients[discon]
                         ignoreDisconnected = []

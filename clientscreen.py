@@ -1,6 +1,6 @@
 import pygame
 from client import Client
-from Games.TicTacToe.tictactoe_gui import TicTacToe
+#from Games.TicTacToe.tictactoe_gui import TicTacToe
 from Games.Nim.NimGUI import Nim
 from dashboard import Dashboard
 from tempclient import TempClient
