@@ -39,6 +39,7 @@ class Client():
         while True:
             try:
                 username_header = self.client_socket.recv(self.HEADER).decode(self.FORMAT)
+                print('recieved')
                 if username_header.split()[0] != 'userlist':
                     print('1')
                     username_length = int(username_header.strip())
@@ -50,8 +51,7 @@ class Client():
                     message_length = int(message_header.strip())
                     print('5')
                     message = self.client_socket.recv(message_length).decode(self.FORMAT)
-                    if username == self.game:
-                        self.recievingQueue.append([username, message])
+                    self.recievingQueue.append([username, message])
                 else:
                     print('10')
                     userListLen = int(username_header.split()[1].strip())

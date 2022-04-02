@@ -51,7 +51,7 @@ class Nim:
         self.removed = 0
         self.submitTurnButton = Button(self.window, 410, 590, (180, 80), 'SUBMIT')
         self.run = True
-        self.turn = False
+        self.turn = True
 
         self.bgColor = (74, 111, 165)
         margin = 40
