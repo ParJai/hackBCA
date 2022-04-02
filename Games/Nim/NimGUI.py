@@ -99,7 +99,7 @@ class Nim:
                 self.rowSelected, self.removed = 10, 0
                 self.turn = False
             
-            self.endScreen()
+            #self.endScreen()
 
     def draw(self):
         self.window.fill(self.bgColor)
