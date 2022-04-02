@@ -98,8 +98,9 @@ class Nim:
         for row in self.stones:
             for stone in row:
                 stone.draw()
-            if self.rowSelected != 0:
+            if self.rowSelected != 10:
                 self.checkStoneClick(row)
+                self.rowSelected = self.stones.index(row)
             else:
                 if self.rowSelected == self.stones.index(row):
                     self.checkStoneClick(row)
