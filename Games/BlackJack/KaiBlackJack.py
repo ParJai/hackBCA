@@ -1,254 +1,268 @@
+# Blackjack Card Game
+# I like to play blackjack using cards. I'm not addicted to gambling. I'm addicted to sitting in a semi-circle.
+# So I have impelmented "Black Jack" game in Python using Code Skulptor Tool.
+# To know more about Black Jack go to this link:  http://en.wikipedia.org/wiki/Blackjack
+
 import random
 
-dealer_bust = False
-player_bust = False
-play_again = 'y'
-blackjack = False
-error = False
+# load card sprite - 949x392 - source: jfitz.com
+from PySimpleGUI import PySimpleGUI
+
+CARD_SIZE = (73, 98)
+CARD_CENTER = (36.5, 49)
+card_images = PySimpleGUI.Image("http://commondatastorage.googleapis.com/codeskulptor-assets/cards.jfitz.png")
+
+CARD_BACK_SIZE = (71, 96)
+CARD_BACK_CENTER = (35.5, 48)
+card_back = PySimpleGUI.Image("http://commondatastorage.googleapis.com/codeskulptor-assets/card_back.png")
+
+# initialize some useful global variables
+
+in_play = False
+outcome = ""
+score = 0
+cover = 1
+
+# define globals for cards
+
+SUITS = ('Clubs', 'S', 'H', 'D')
+RANKS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K')
+VALUES = {'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'T': 10, 'J': 10, 'Q': 10, 'K': 10}
 
 
-suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
-ranks = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace')
-values = {'Two': 2, 'Three': 3, 'Four': 4, 'Five': 5, 'Six': 6, 'Seven': 7, 'Eight': 8, 'Nine': 9, 'Ten': 10, 'Jack': 10, 'Queen': 10, 'King': 10, 'Ace': 11}
-
+# define card class
 
 class Card:
 
     def __init__(self, suit, rank):
-        self.suit = suit
-        self.rank = rank
+
+        if (suit in SUITS) and (rank in RANKS):
+
+            self.suit = suit
+            self.rank = rank
+
+        else:
+
+            self.suit = None
+            self.rank = None
+            print
+            "Invalid card: ", suit, rank
 
     def __str__(self):
-        return self.rank + ' of ' + self.suit
+
+        return self.suit + self.rank
+
+    def get_suit(self):
+
+        return self.suit
+
+    def get_rank(self):
+
+        return self.rank
+
+    def draw(self, canvas, pos):
+
+        card_loc = (CARD_CENTER[0] + CARD_SIZE[0] * RANKS.index(self.rank),
+                    CARD_CENTER[1] + CARD_SIZE[1] * SUITS.index(self.suit))
+        canvas.draw_image(card_images, card_loc, CARD_SIZE, [pos[0] + CARD_CENTER[0], pos[1] + CARD_CENTER[1]],
+                          CARD_SIZE)
 
 
-class Deck:
-
-    def __init__(self):
-        self.deck = []
-        for suit in suits:
-            for rank in ranks:
-                self.deck.append(Card(suit, rank))
-
-    def __str__(self):
-        return rank + ' of ' + suit
-
-    def shuffle(self):
-        random.shuffle(self.deck)
-
-    def display(self):
-        for card in self.deck:
-            print(card)
-
-    def deal(self):
-        return self.deck.pop()
-
+# define hand class
 
 class Hand:
 
     def __init__(self):
+
         self.cards = []
-        self.value = 0
-        self.aces = 0
+
+    def __str__(self):
+
+        s = "Cards in hand: "
+
+        for i in self.cards:
+            s = s + str(i) + " "
+
+        return s
 
     def add_card(self, card):
+
         self.cards.append(card)
-        self.value += values[card.rank]
 
-        if card.rank == 'Ace':
-            self.aces += 1
+    def get_value(self):
 
-    def adjust_for_ace(self):
-        while self.value > 21 and self.aces > 0:
-            self.value -= 10
-            self.aces -= 1
+        value = 0
+        isAcePresent = False
 
-    def show_hand(self):
-        for card in self.cards:
-            print(card.__str__())
+        for i in self.cards:
+
+            value = value + VALUES[i.get_rank()]
+
+            if value == 1:
+                isAcePresent = True
+
+        if (isAcePresent) and ((value + 10) <= 21):
+            value = value + 10
+
+        return value
+
+    def draw(self, canvas, pos):
+
+        j = 0
+
+        for i in self.cards:
+            i.draw(canvas, [(pos[0] + (j * 80)), pos[1]])
+            j = j + 1
 
 
-class Chips:
+# define deck class
+
+class Deck:
 
     def __init__(self):
-        self.total = 100
-        self.bet = 0
 
-    def win_bet(self):
-        self.total += self.bet
+        self.cards = []
 
-    def lose_bet(self):
-        self.total -= self.bet
+        for suit in SUITS:
+
+            for rank in RANKS:
+                self.cards.append(Card(suit, rank))
+
+    def shuffle(self):
+
+        random.shuffle(self.cards)
+
+    def deal_card(self):
+
+        return self.cards.pop()
+
+    def __str__(self):
+
+        s = "Cards in deck: "
+
+        for i in self.cards:
+            s = s + str(i) + " "
+
+        return s
 
 
-def again():
-    global play_again
-    global dealer_bust
-    global player_bust
-    global blackjack
-    global error
-    dealer_bust = False
-    player_bust = False
-    play_again = 'y'
-    blackjack = False
-    error = False
-    play_again = input('Would you like to play again? (y/n) ').lower()
-    if play_again == 'y' or play_again == 'n':
-        pass
+# define event handlers for buttons
+
+def deal():
+    global outcome, in_play, score, card, deck, hand, dealer, cover
+
+    if in_play:
+        in_play = False
+        outcome = "You lose! New deal?"
+        cover = 0
+        score = score - 1
+
     else:
-        again()
+        new_deck = Deck()
+        new_hand = Hand()
+        new_dealer = Hand()
+
+        deck = new_deck
+        hand = new_hand
+        dealer = new_dealer
+
+        deck.shuffle()
+
+        hand.add_card(deck.deal_card())
+        hand.add_card(deck.deal_card())
+
+        dealer.add_card(deck.deal_card())
+        dealer.add_card(deck.deal_card())
+
+        cover = 1
+        outcome = "Hit or stand?"
+        in_play = True
 
 
-def play():
-    global error
-    if not error:
-        print('\n' * 100)
-    print(f'You have a total of: {player_chips.total} chips')
-    player_chips.bet = input('How many chips would you like to bet? ')
-    try:
-        player_chips.bet = int(player_chips.bet)
-    except ValueError:
-        error = True
-        print('\n' * 100)
-        play()
-    if player_chips.bet > player_chips.total:
-        error = True
-        print('\n' * 100)
-        print('Sorry, you do not have enough chips to place that bet.')
-        play()
-    elif player_chips.bet == 0 or player_chips.bet < 0:
-        error = True
-        print('\n' * 100)
-        print('Sorry, you cannot bet 0 chips or less.')
-        play()
-    else:
-        pass
+def hit():
+    global outcome, in_play, score, card, deck, hand, dealer, cover
 
-    hit_stand = ''
+    if in_play:
 
-    # DEALER CARDS #
-    print('\n' * 100)
-    dealer = Hand()
-    print("Dealer's cards:")
-    dealer.add_card(deck.deal())
-    dealer.show_hand()
-    dealer.adjust_for_ace()
-    print('???')
+        card = deck.deal_card()
+        hand.add_card(card)
 
-    # PLAYER CARDS/PLAY #
-    global dealer_bust
-    global player_bust
-    global blackjack
-    player = Hand()
-    print('\n' * 2)
-    print("Your cards:")
-    player.add_card(deck.deal())
-    player.add_card(deck.deal())
-    player.adjust_for_ace()
-    player.show_hand()
-    print('\n')
-    print(f'The total value of your cards is {player.value}.')
-    if player.value == 21:
-        blackjack = True
-    else:
-        while hit_stand != 'hit' and hit_stand != 'stand':
-            hit_stand = input('Would you like to hit or stand? ').lower()
-            print('\n' * 100)
-            if hit_stand == 'hit':
-                while hit_stand == 'hit':
-                    print("Dealer's cards:")
-                    dealer.show_hand()
-                    print('???')
-                    print('\n' * 2)
-                    player.add_card(deck.deal())
-                    player.adjust_for_ace()
-                    print('Your cards:')
-                    player.show_hand()
-                    print('\n')
-                    print(f'The total value of your cards is {player.value}.')
-                    print('\n')
-                    if player.value < 21:
-                        pass
-                    elif player.value == 21:
-                        blackjack = True
-                        break
-                    else:
-                        print('\n')
-                        print('BUST!')
-                        print('Dealer wins.')
-                        player_bust = True
-                        break
-                    hit_stand = input('Would you like to hit or stand? ').lower()
-                    print('\n' * 100)
-            elif hit_stand == 'stand':
-                break
+        if hand.get_value() > 21:
+            in_play = False
+            outcome = "Busted! You lose! New deal?"
+            cover = 0
+            score = score - 1
 
-    # IF BLACKJACK #
-    if blackjack:
-        print("Congratulations, you win!")
-        player_chips.win_bet()
-        print(f'You now have a total of {player_chips.total} chips.')
-        again()
-    else:
-        # DEALER PLAY #
-        if not player_bust:
-            while dealer.value < 17:
-                print('\n' * 100)
-                print("Dealer's cards:")
-                dealer.add_card(deck.deal())
-                dealer.adjust_for_ace()
-                dealer.show_hand()
-                print('\n')
-                print(f"Dealer's value: {dealer.value}")
-                if dealer.value > 21:
-                    print('Dealer BUST!')
-                    dealer_bust = True
-                    break
-                else:
-                    continue
 
-        # CHECK WHO WINS #
-        global play_again
-        print('\n')
-        if not dealer_bust and not player_bust:
-            if player.value > dealer.value:
-                print("Congratulations, you win!")
-                player_chips.win_bet()
-                print(f'You now have a total of {player_chips.total} chips.')
-            elif player.value < dealer.value:
-                print('Sorry, you lost.')
-                player_chips.lose_bet()
-                print(f'You now have a total of {player_chips.total} chips.')
+def stand():
+    global outcome, in_play, score, card, deck, hand, dealer, cover
+
+    if in_play:
+
+        cover = 0
+
+        while dealer.get_value() < 17:
+            card = deck.deal_card()
+            dealer.add_card(card)
+
+        if dealer.get_value() > 21:
+
+            outcome = "You win! New deal?"
+            in_play = False
+            score = score + 1
+
+        else:
+
+            if dealer.get_value() >= hand.get_value():
+
+                outcome = "You lose! New deal?"
+                in_play = False
+                score = score - 1
+
             else:
-                print('PUSH!')
-                print(f'You still have a total of {player_chips.total} chips.')
-        elif dealer_bust:
-            print("Congratulations, you win!")
-            player_chips.win_bet()
-            print(f'You now have a total of {player_chips.total} chips.')
-        else:
-            print('Sorry, you lost.')
-            player_chips.lose_bet()
-            print(f'You now have a total of {player_chips.total} chips.')
-        if player_chips.total == 0:
-            print('\n')
-            print('It looks like you have run out of chips for the night. Better luck next time!')
-            play_again = 'n'
-        else:
-            again()
+
+                outcome = "You win! New deal?"
+                in_play = False
+                score = score + 1
 
 
-'''
-PROGRAM
-'''
+# draw handler
+
+def draw(canvas):
+    global outcome, in_play, score, card, deck, hand, dealer, cover
+
+    canvas.draw_text("Blackjack", (210, 70), 48, 'Black')
+    canvas.draw_text("Score: " + str(score), (250, 110), 32, 'Black')
+    canvas.draw_text("Dealer:", (250, 180), 32, 'Black')
+    canvas.draw_text("Player:", (250, 390), 32, 'Black')
+    dealer.draw(canvas, [100, 210])
+    hand.draw(canvas, [100, 420])
+    canvas.draw_text(outcome, (150, 560), 32, 'Black')
+
+    if cover == 1:
+        canvas.draw_image(card_back, CARD_BACK_CENTER, CARD_BACK_SIZE, [136.5, 259], CARD_SIZE)
 
 
-player_chips = Chips()
-while play_again == 'y':
-    deck = Deck()
-    deck.shuffle()
+# initialize frame
 
-    play()
-if player_chips.total != 0:
-    print(f'You ended with a total of {player_chips.total} chips.')
-    print('Hope you had a fun night at the Casino! Remember to cash out your winnings and come back tomorrow!')
+frame = PySimpleGUI.Frame("Blackjack", 600, 600)
+frame.set_canvas_background("Orange")
+
+# initialize data
+
+card = Card("S", "A")
+deck = Deck()
+hand = Hand()
+dealer = Hand()
+
+# create buttons and canvas callback
+
+frame.add_button("Deal", deal, 200)
+frame.add_button("Hit", hit, 200)
+frame.add_button("Stand", stand, 200)
+frame.set_draw_handler(draw)
+
+# get things rolling
+
+deal()
+frame.start()
