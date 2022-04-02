@@ -651,9 +651,9 @@ class TicTacToe():
                                     move = 7
                             elif tile_9.collidepoint(click_pos):
                                 if not nine_filled:
-                                    to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_9.center, blue))
-                                    board.addMove(8, player_1_x[turn])
-                                    nine = player_1_x[turn]
+                                    to_draw.append(("O", 'tahoma.ttf', 150, tile_9.center, blue))
+                                    board.addMove(8, "O")
+                                    nine = "O"
                                     nine_filled = True
                                     turn += 1
                                     move = 8
