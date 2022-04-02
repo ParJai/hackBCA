@@ -111,6 +111,7 @@ class Nim:
                 else:
                     if self.rowSelected == self.stones.index(row):
                         self.checkStoneClick(row)
+            
             self.submitTurnButton.draw()
             
         pygame.display.update()
