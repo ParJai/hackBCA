@@ -13,13 +13,16 @@ def write(screen, text, font, text_size, center, color):
     screen.blit(text_to_write, text_rect)
 
 class Button:
-    def __init__(self, window, x, y):
+    def __init__(self, window, x, y, size, text):
         self.window = window
         self. x = x
         self.y = y
+        self.size = size
+        self.text = text
     
     def draw(self):
-        pygame.draw.rect(self.window, (219, 223, 172), )
+        pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
+        write(self.window, self.text, 'tahoma.ttf', 30, ((self.x + (self.size[0] / 2), self.)))
 
     def onClick(self):
         pass
@@ -43,8 +46,9 @@ class Nim:
         self.board = board
         self.stones = []
         self.rowSelected = 0
+        self.submitTurnButton = Button(self.window, 410, 590, (180, 80))
         self.run = True
-        
+
         self.bgColor = (74, 111, 165)
         margin = 40
 
@@ -84,6 +88,7 @@ class Nim:
             else:
                 if self.rowSelected == self.stones.index(row):
                     self.checkStoneClick(row)
+        self.submitTurnButton.draw()
         pygame.display.update()
 
     def checkStoneClick(self, row):
