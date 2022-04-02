@@ -33,8 +33,6 @@ class Hand:
     def add_card(self, card):
         self.cards.append(card)
 
-        if card[0] == 'ace':
-
     def calculate(self):
         ranks = [card[0] for card in self.cards]
         aces = [rank for rank in ranks if rank == "ace"]
