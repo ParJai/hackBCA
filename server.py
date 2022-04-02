@@ -48,10 +48,13 @@ def checkValidGame(game, conn):
         if len(tempAGMgame) < games[game]-1:
             agm.append([])
             tempAGMgame.append(conn)
+            print('player joined')
+            print(tempAGMgame)
+            print(agm)
             return agm[-1]
         else:
             tempAGMgame.append(agm)
-            agm[-1] == tempAGMgame
+            agm[-1] = tempAGMgame
             tempAGMgame=[]
             return agm[-1]
     elif game == 'bts':
@@ -114,6 +117,7 @@ def handle_client(conn, addr):
                     print(msg)
                     if msg != "": 
                         print(msg, "message")
+                        print(gameList)
                         for client_socket in gameList:
                             if client_socket != conn:
                                 try:
