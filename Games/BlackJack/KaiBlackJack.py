@@ -1,21 +1,7 @@
 # main.py
 
 import random
-import pydealer
 from time import sleep
-
-
-def welcome():
-    print(
-        "Welcome to the game of Blackjack! In this game, you will be dealt two cards to start. Your goal is to get as close to 21 as possible without going over - or busting! In this game, Jack, Queen, and King are worth 10 and the Ace is worth 1 or 11 (you get to choose).")
-
-    print(
-        "\nThe dealer will first ask you to hit (take another card) or stay. As long as you don't bust, once you decide to stay, the dealer will then play his hand. The dealer always has to hit until his hand is at least 17. Whoever has the better hand (the hand that is closer to 21) at the end wins!")
-
-    start = input("\nPress any key to start playing. ")
-
-    main()
-
 
 def main():
     deck = []
@@ -34,25 +20,11 @@ def main():
     total = 0
     counter = 0
 
-    if "Ace" in hand and "Queen" in hand:
-        print(f"\nHere is your hand: {hand}")
-        print("\nBlackjack! You win!")
-        end()
-
-    if "Ace" in hand and "King" in hand:
-        print(f"\nHere is your hand: {hand}")
-        print("\nBlackjack! You win!")
-        end()
-
-    if "Ace" in hand and "Jack" in hand:
-        print(f"\nHere is your hand: {hand}")
-        print("\nBlackjack! You win!")
-        end()
-
-    if "Ace" in hand and 10 in hand:
-        print(f"\nHere is your hand: {hand}")
-        print("\nBlackjack! You win!")
-        end()
+    if "Ace" in hand:
+        if "Queen" in hand or "King" in hand or "Jack" in hand or 10 in hand:
+            print(f"\nHere is your hand: {hand}")
+            print("\nBlackjack! You win!")
+            end()
 
     for element in hand:
         if element == 'Queen' or element == 'Jack' or element == 'King':
