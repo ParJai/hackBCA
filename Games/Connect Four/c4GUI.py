@@ -4,11 +4,11 @@ class circle:
     def __init__(self, x, y, window):
         self.x=x
         self.y=y
-        self.winodw = window
+        self.window = window
         self.color = (12, 50, 97)
 
     def draw(self):
-        pygame.draw.circle(self.winodw, self.color, (self.x, self.y), 30)
+        pygame.draw.circle(self.window, self.color, (self.x, self.y), 30)
 class Connect4:
     def __init__(self, window, clock):
         self.window = window
@@ -25,10 +25,11 @@ class Connect4:
 
         self.prevcol = -1
 
-        self.field = [["O" for i in range(8)] for j in range(9)];
+        self.field = [["O" for i in range(8)] for j in range(9)]
         self.player = self.newGame()
 
         self.loadCircles()
+        
         while self.run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -36,29 +37,29 @@ class Connect4:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = pygame.mouse.get_pos()
                     if 200 < mx < 800:
-                        if self.cols[(mx-200)//100] != []:
+                        if self.cols[(mx-150)//100] != []:
                             print("\n".join([", ".join(i) for i in self.field]))
-                            self.placePiece((mx-200)//100)
-                            self.player = self.nextTurn(self.player, 7-(7-len(self.cols[(mx-200)//100])), (mx-200)//100)
-                            print(self.checkWin(7-(7-len(self.cols[(mx-200)//100])), (mx-200)//100))
-                            if self.checkWin(7-(7-len(self.cols[(mx-200)//100])), (mx-200)//100):
-                                print('Player 1 Won' if self.player == 2 else 'Player 2 Won')
+                            self.placePiece((mx-150)//100)
+                            self.player = self.nextTurn(self.player, (mx-150)//100, len(self.cols[(mx-150)//100]))
+                            print(self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100))
+                            if self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100):
+                                print('Player 2 Won' if self.player == False else 'Player 1 Won')
                                 self.run = False
             self.draw()
     
     def draw(self):
         mx, my = pygame.mouse.get_pos()
         self.window.fill((231, 173, 153))
-        pygame.draw.rect(self.window, (0,0,255), (200, 0, 600, 700))
+        pygame.draw.rect(self.window, (0,0,255), (150, 0, 700, 600))
         for i in self.circles: i.draw()
         if 200 < mx < 800:
-            if self.prevcol != (mx-200)//100:
-                for i in self.cols[(mx-200)//100]:
+            if self.prevcol != (mx-150)//100:
+                for i in self.cols[(mx-150)//100]:
                     i.color = (29, 94, 173)
                 if self.prevcol != -1:
                     for i in self.cols[self.prevcol]:
                         i.color = (12, 50, 97)
-                self.prevcol = (mx-200)//100
+                self.prevcol = (mx-150)//100
         else:
             if self.prevcol != -1:
                 for i in self.cols[self.prevcol]:
@@ -69,9 +70,9 @@ class Connect4:
     def loadCircles(self):
         col = 0
         row = 0
-        for x in range(250, 800, 100):
+        for x in range(200, 851, 100):
             tempcol = []
-            for y in range(50, 700, 100):
+            for y in range(50, 601, 100):
                 circ = circle(x, y, self.window)
                 self.circles.append(circ)
                 self.cir[f'{col},{row}'] = circ
@@ -89,6 +90,8 @@ class Connect4:
         return (False)
 
     def nextTurn(self, player, column, row):
+        row += 1
+        column += 1
         if not player:
             self.field[column][row] = 'R'
         else:
@@ -97,7 +100,8 @@ class Connect4:
         return(not player)
     
     def placePiece(self, col):
-        self.row = 7-(7-len(self.cols[col]))
+
+        self.row = len(self.cols[col])
         if not self.player:
             self.cols[col][0].color = (255,0,0)
         else:
@@ -105,6 +109,10 @@ class Connect4:
         del self.cols[col][0]
     
     def checkWin(self, row, col):
+        row += 1
+        col += 1
+        global field
+
         numUp = 0
         numDown = 0
         numLeft = 0
@@ -118,7 +126,7 @@ class Connect4:
         #up direction
         for i in range(row + 1, 7):
             if self.field[col][i] == var:
-                numUp += 1
+               numUp += 1
             else:
                 break
 
@@ -189,8 +197,6 @@ class Connect4:
                 return [True, False]
             else:
                 return [True, True]
-
-
         diagonal2TopRight = 0
         diagonal2BottomLeft = 0
 

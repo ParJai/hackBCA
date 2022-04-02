@@ -14,8 +14,6 @@ sockets_list = [server_socket]
 clients = {}
 userList = []
 
-with open('nothing.txt') as data: nstring = data.read().strip()
-
 games = {'ttt': 2, 'c4': 2, 'agm': 2, 'bts' : 2, 'bj': 4, 'nim': 2}
 tttGames, tempTTTgame = [['tempgame']], []
 c4, tempc4game = [['tempgame']], []
@@ -25,66 +23,67 @@ bj, tempBJgame = [['tempgame']], []
 nim, tempNIMgame = [['tempgame']], []
 
 def checkValidGame(game, conn):
+    global games, tttGames, tempTTTgame, c4, tempc4game, agm, tempAGMgame, bts, tempBTSgame, bj, tempBJgame, nim, tempNIMgame
     if game == "ttt":
         if len(tempTTTgame) < games[game]-1:
             tttGames.append([])
             tempTTTgame.append(conn)
-            return len(tttGames)
+            return tttGames[-1]
         else:
             tempTTTgame.append(conn)
             tttGames[-1] = tempTTTgame
             tempTTTgame=[]
-            return len(tttGames)-1
+            return tttGames[-1]
     elif game == 'c4':
         if len(tempc4game) < games[game]-1:
             tempc4game.append(conn)
             c4.append([])
-            return len(c4)
+            return c4[-1]
         else:
             tempc4game.append(conn)
             c4[-1] = tempc4game
             tempc4game=[]
-            return len(c4)-1
+            return c4[-1]
     elif game == 'agm':
         if len(tempAGMgame) < games[game]-1:
             agm.append([])
             tempAGMgame.append(conn)
-            return len(agm)
+            return agm[-1]
         else:
             tempAGMgame.append(agm)
             agm[-1] == tempAGMgame
             tempAGMgame=[]
-            return len(agm)-1
+            return agm[-1]
     elif game == 'bts':
         if len(tempBTSgame) < games[game]-1:
             bts.append([])
             tempBTSgame.append(conn)
-            return len(bts)
+            return bts[-1]
         else:
             tempBTSgame.append(bts)
             bts[-1] == tempBTSgame
             tempBTSgame=[]
-            return len(bts)-1
+            return bts[-1]
     elif game == 'bj':
         if len(tempBJgame) < games[game]-1:
             bj.append([])
             tempBJgame.append(conn)
-            return len(bj)
+            return bj[-1]
         else:
             tempBJgame.append(bj)
             bj[-1] == tempBJgame
             tempBJgame=[]
-            return len(bj)-1
+            return bj[-1]
     elif game == 'nim':
         if len(tempNIMgame) < games[game]-1:
             nim.append([])
             tempNIMgame.append(conn)
-            return len(nim)-1
+            return nim[-1]
         else:
             tempNIMgame.append(nim)
             nim[-1] == tempNIMgame
             tempNIMgame=[]
-            return len(nim)-1
+            return nim
 
 def handle_client(conn, addr):
 
@@ -101,25 +100,24 @@ def handle_client(conn, addr):
     except:
         print('unable to get username')
     
-    gameList = checkValidGame(game[data], conn)
+    gameList = checkValidGame(game['data'], conn)
     
     sockets_list.append(conn)
     ignoreDisconnected = []
     connected = True
     while connected:
-        if len(gameList) != 0:
             try:
                 msg_len = conn.recv(HEADER).decode(FORMAT)
                 if msg_len: 
                     msg_len = int(msg_len)
                     msg = conn.recv(msg_len).decode(FORMAT)
                     print(msg)
-                    if msg != nstring: 
+                    if msg != "": 
                         print(msg, "message")
-                        for client_socket in clients:
+                        for client_socket in gameList:
                             if client_socket != conn:
                                 try:
-                                    clients[client_socket].append(f"{user['header']:<{HEADER}}:{user['data']}:{msg_len:<{HEADER}}:{msg}")
+                                    clients[client_socket].append(f"{game['header']:<{HEADER}}:{game['data']}:{msg_len:<{HEADER}}:{msg}")
                                     split_msg = clients[client_socket][0].split(":")
                                     client_socket.send(split_msg[0].encode(FORMAT))
                                     client_socket.send(split_msg[1].encode(FORMAT))
@@ -138,20 +136,13 @@ def handle_client(conn, addr):
                             client_socket.send(split_msg[1].encode(FORMAT))
                             client_socket.send(split_msg[2].encode(FORMAT))
                             client_socket.send(''.join(split_msg[3:]).encode(FORMAT))
-                        else:
-                            conn.send(nstring.encode(FORMAT))
                 else:
                     connected = False
             except:
                 connected = False
-    
-    userList.remove(user['data'])
     del clients[conn]
     conn.close()
-    joinedUserList = ':'.join(userList)
-    for client in clients.keys():
-        client.send(f"{'userlist      '+str(len(joinedUserList)):<{HEADER}}".encode(FORMAT))
-        client.send(joinedUserList.encode(FORMAT))
+    
 def start():
     server_socket.listen(999)
     print(f"[LISTENING] Server is listening on {IP}")
