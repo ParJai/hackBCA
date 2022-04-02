@@ -999,6 +999,7 @@ class TicTacToe():
                         nine = computerPiece
                         nine_filled = True
                         turn += 1
+                click_pos = (0, 0)
                 del self.client.recievingQueue[0]
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
