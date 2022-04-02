@@ -1,11 +1,11 @@
 #input: player, column, row
 #Field: 6 by 7, outer rim filled by 'O' - bound square, 'B' - Blank square, 'R' - p1, 'Y' - p2
-import client
-import threading
+
+
 from time import *
 import os
 import KaiConnect
-
+import clientd
 
 class ConnectFour:
     field = [["O" for i in range(8)] for j in range(9)]
@@ -13,7 +13,7 @@ class ConnectFour:
         self.player1 = player1
         self.player2 = player2
 
-    def error(code):
+    def error(code, player):
         if code == 0:
             pass
             #INVALID MOVE
@@ -26,6 +26,7 @@ class ConnectFour:
 
     def waitforinp():
         msg = ""
+        player = 0
         while(len(msg) < 1):
             try:
                 msg = client.recieve_message()
@@ -35,6 +36,7 @@ class ConnectFour:
             t1 = msg.index(";")
             msg = msg[t1 + 1::]
             t2 = msg.index(";")
+            player = msg[t1 + 1:t2]
             msg = msg[t2 + 1]
             t3 = msg.index(";")
             arr = msg[t2 + 1 : t3]
@@ -44,7 +46,7 @@ class ConnectFour:
             arr.append(msg[t4 + 1::])
             return arr
         except:
-            error(2)
+            error(2, player)
             return waitforinp()
     
 
@@ -88,15 +90,16 @@ class ConnectFour:
 
             while(not inputCheck(player, row, col) or inPlayer != player):
                 if inPlayer != player:
-                    error(1)
+                    error(1, inPlayer)
                 else:
-                    error(0)
+                    error(0, inPlayer)
                 inp = waitforinp()
                 inPlayer, row, col = inp[0], inp[1], inp[2]
             player = nextTurn(player, row, col)
             KaiConnect.checkWins(col, row)
 
-
+game = ConnectFour(player1, player2)
+game.main()
 
 
 
