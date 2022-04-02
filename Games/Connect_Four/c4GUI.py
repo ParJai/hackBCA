@@ -58,7 +58,7 @@ class Connect4:
                         if self.cols[(mx-150)//100] != []:
                             print("\n".join([", ".join(i) for i in self.field]))
                             self.placePiece((mx-150)//100)
-                            self.client.messageQueue.append(str((mx-200)//100))
+                            self.client.messageQueue.append(str((mx-150)//100))
                             self.player = self.nextTurn(self.player, (mx-150)//100, len(self.cols[(mx-150)//100]))
                             print(self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100))
                             if self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100):
