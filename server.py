@@ -14,8 +14,6 @@ sockets_list = [server_socket]
 clients = {}
 userList = []
 
-with open('nothing.txt') as data: nstring = data.read().strip()
-
 games = {'ttt': 2, 'c4': 2, 'agm': 2, 'bts' : 2, 'bj': 4, 'nim': 2}
 tttGames, tempTTTgame = [['tempgame']], []
 c4, tempc4game = [['tempgame']], []
@@ -25,6 +23,7 @@ bj, tempBJgame = [['tempgame']], []
 nim, tempNIMgame = [['tempgame']], []
 
 def checkValidGame(game, conn):
+    global games, tttGames, tempTTTgame, c4, tempc4game, agm, tempAGMgame, bts, tempBTSgame, bj, tempBJgame, nim, tempNIMgame
     if game == "ttt":
         if len(tempTTTgame) < games[game]-1:
             tttGames.append([])
@@ -101,7 +100,7 @@ def handle_client(conn, addr):
     except:
         print('unable to get username')
     
-    gameList = checkValidGame(game[data], conn)
+    gameList = checkValidGame(game['data'], conn)
     
     sockets_list.append(conn)
     ignoreDisconnected = []
