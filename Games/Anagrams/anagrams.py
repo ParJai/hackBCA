@@ -3,6 +3,7 @@ import itertools
 import pygame
 import sys
 import Holding
+import time
 print(sys.path[0])
 f = open(sys.path[0] + "\\words.txt", 'r')
 WORDLIST = f.read().split()
@@ -11,6 +12,7 @@ SIXLIST = f2.read().split()
 
 class anagrams:
     def __init__(self, window, clock):
+        self.current = time.time()
         self.window = window
         self.clock = clock
         self.run = True
@@ -18,6 +20,8 @@ class anagrams:
         letters = self.generateList()
         valid = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
         user_text = ''
+        score = 69
+        combos = self.finalCombos(letters)
 
         
         color_active = pygame.Color('lightskyblue3')
@@ -34,11 +38,20 @@ class anagrams:
                         user_text = user_text[:-1]
                     
                     else:
+                        prev = len(user_text)
                         user_text += event.unicode
-                        if user_text[-1] not in letters:
-                            user_text = user_text[:-1]
-
-            self.draw(letters, words, user_text)
+                        next = len(user_text)
+                    
+                        if (prev != next):
+                            if user_text[-1] in valid:
+                                if user_text[-1].upper() not in letters:
+                                    user_text = user_text[:-1]
+                                
+                            else:
+                                user_text = user_text[:-1]
+                        if event.unicode == pygame.K_KP_ENTER:
+                            pass
+            self.draw(letters, words, user_text, score)
 
     def shuffle(self, s):
         # Shuffles word randomly
@@ -72,7 +85,7 @@ class anagrams:
         letters = []
         for i in range (len(word)):
             letters.append(word[i])
-            return letters
+        return letters
 
     def isValidList(self, aList):
         if self.value(self.finalCombos(aList)) >= 10000:
@@ -121,22 +134,22 @@ class anagrams:
         text_rect.center = center
         screen.blit(text_to_write, text_rect)
         
-    def draw(self, letters, words, user_text):
+    def draw(self, letters, words, user_text, score):
         self.window.fill((231, 173, 153))
         pygame.draw.rect(self.window, (255,255,255), (150, 0, 700, 600))
         self.write(self.window, "ANAGRAMS", "tahoma.ttf", 36, (500, 30), (203, 98, 23))
         #input rect
         color = pygame.Color('lightskyblue3')
-        input_rect = pygame.Rect(200, 200, 140, 32)
+        input_rect = pygame.Rect(175, 300, 650, 96)
         pygame.draw.rect(self.window, color, input_rect)
-        self.write(self.window, user_text, "tahoma.ttf", 24, (300, 100), (0, 0, 0))
-
+        self.write(self.window, user_text, "tahoma.ttf", 50, (175, 300), (0, 0, 0))
+        self.write(self.window, f"Time: {60 - (int(time.time() - self.current))}", "tahoma.ttf", 30, (500, 650), (0, 0, 255))
         for i in range (0, 6):
-            window.blit(pygame.image.load(f'anagramsLetters/{letters[i]}.png').convert(), (180 + i * 108, 400))
+            window.blit(pygame.image.load(f'Games/Anagrams/anagramsLetters/{letters[i]}.png').convert(), (180 + i * 108, 400))
 
         self.write(self.window, f"Score: {score}", "tahoma.ttf", 30, (500, 80), (0, 196, 0))
 
-        pygame.display.flip()
+        pygame.display.update()
 WIDTH = 1000
 HEIGHT = 700
 
