@@ -1,9 +1,15 @@
 #input: player, column, row
 #Field: 6 by 7, outer rim filled by 'O' - bound square, 'B' - Blank square, 'R' - p1, 'Y' - p2
+import client
+import threading
+
 field = [[]];
 
-def send():
-    return False
+def mPros(message):
+    t1 = message.index(";");
+    message = message[t1 + 1::]
+    t2 = message.index(";");
+    return message[t2 + 1::]
 def newGame():
     global field
     for col in range (0, 9):
@@ -12,7 +18,7 @@ def newGame():
                 field[col][row] = 'O'
             else:
                 field[col][row] ='B'
-    return (0)
+    return (False)
 
 #Check , if requested field is blank, proceed, otherwise return error. Main will recieve output from funcs in
 #form of [player who's turn it is(0 or 1), error check]
@@ -36,17 +42,25 @@ def checkWins(row, column):
     return False
 
 def main():
-    out = newGame()
+    player = newGame()
     #field, row, column
     #checkWins
     #false or true, 0/1
     win = False
 
     while (not win):
-        x, y, z = 1, 2, 3;
-        while(not inputCheck(x, y, z) or x != out):
+        #input
 
-        playerIn = [x, y, z]
+        while(not inputCheck(player, y, z) or inPlayer != player):
+            if inPlayer != player:
+                #send not your turn message
+            else:
+                #send invalid move message
+            #collect new inputs
+
+        player = nextTurn(player, y, z)
+        checkWins(y, z)
+
 
 
 
