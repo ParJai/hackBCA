@@ -39,10 +39,10 @@ class Connect4:
                         if self.cols[(mx-150)//100] != []:
                             print("\n".join([", ".join(i) for i in self.field]))
                             self.placePiece((mx-150)//100)
-                            self.player = self.nextTurn(self.player, 7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100)
+                            self.player = self.nextTurn(self.player, (mx-150)//100, len(self.cols[(mx-150)//100]))
                             print(self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100))
                             if self.checkWin(7-(7-len(self.cols[(mx-150)//100])), (mx-150)//100):
-                                print('Player 1 Won' if self.player == 2 else 'Player 2 Won')
+                                print('Player 2 Won' if self.player == False else 'Player 1 Won')
                                 self.run = False
             self.draw()
     
@@ -100,7 +100,7 @@ class Connect4:
     
     def placePiece(self, col):
 
-        self.row = 7-(7-len(self.cols[col]))
+        self.row = len(self.cols[col])
         if not self.player:
             self.cols[col][0].color = (255,0,0)
         else:
@@ -108,8 +108,10 @@ class Connect4:
         del self.cols[col][0]
     
     def checkWin(self, row, col):
-        row+=1
-        col+=1
+        row += 1
+        col += 1
+        global field
+
         numUp = 0
         numDown = 0
         numLeft = 0
@@ -123,7 +125,7 @@ class Connect4:
         #up direction
         for i in range(row + 1, 7):
             if self.field[col][i] == var:
-                numUp += 1
+               numUp += 1
             else:
                 break
 
@@ -194,8 +196,6 @@ class Connect4:
                 return [True, False]
             else:
                 return [True, True]
-
-
         diagonal2TopRight = 0
         diagonal2BottomLeft = 0
 
