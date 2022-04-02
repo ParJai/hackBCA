@@ -43,7 +43,7 @@ class Nim:
     def __init__(self, window, clock, client):
         self.window = window
         self.clock = clock
-        self.mouse_pos = ()
+        self.mouse_pos = (0, 0)
         self.client = client
 
         self.board = board
@@ -56,7 +56,11 @@ class Nim:
         self.bgColor = (74, 111, 165)
         margin = 40
 
-        self.player = int(self.client.recievingQueue[0][1])
+        msg = ""
+        sending = threading.Thread(target = self.client.send_message, args = (msg,), daemon = True)
+        sending.start()
+        recieving = threading.Thread(target = self.client.recieve_message, args = (), daemon = True)
+        recieving.start()
 
         for row in range(len(self.board)):
             self.stones.append([])
@@ -73,12 +77,6 @@ class Nim:
                 else:
                     x = self.stones[-1][-1].x + margin + (size * 2)
                 self.stones[-1].append(Stone(self.window, row + 1, x, y, size))
-
-        msg = ""
-        sending = threading.Thread(target = self.client.send_message, args = (msg,), daemon = True)
-        sending.start()
-        recieving = threading.Thread(target = self.client.recieve_message, args = (), daemon = True)
-        recieving.start()
 
         while self.run:
             for event in pygame.event.get():

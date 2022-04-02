@@ -111,9 +111,9 @@ def handle_client(conn, addr):
     send_length += b' ' * (HEADER - len(send_length))
     client_socket.send(send_length)
     if len(gameList) == 1:
-        client_socket.send("1")
+        conn.send("1")
     else:
-        client_socket.send("2")
+        conn.send("2")
     
     sockets_list.append(conn)
     ignoreDisconnected = []
