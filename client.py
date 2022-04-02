@@ -1,6 +1,6 @@
 import socket
 class Client():
-    def __init__(self, username, password):
+    def __init__(self, game):
         self.HEADER = 16
         self.PORT = 9000
         self.IP = "3.222.3.116"
@@ -11,14 +11,14 @@ class Client():
         self.recievingQueue = []
         self.userList = []
 
-        self.my_username = username
+        self.mygame = game
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect(self.ADDR)
 
-        self.username = self.my_username.encode(self.FORMAT)
-        self.username_header = f"{len(self.username):<{self.HEADER}}".encode(self.FORMAT)
-        self.client_socket.send(self.username_header+self.username)
+        self.game = self.mygame.encode(self.FORMAT)
+        self.game_header = f"{len(self.game):<{self.HEADER}}".encode(self.FORMAT)
+        self.client_socket.send(self.game_header+self.game)
 
     def send_message(self, msg):
         while True:
