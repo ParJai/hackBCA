@@ -1,7 +1,152 @@
 import pygame
 import threading
-from AI import AI
-from Board import Board
+from copy import deepcopy
+from random import choice, randint
+
+class Board:
+    def __init__(self, board_size: int) -> None:
+        self.board_size = board_size
+        self.boardArr = [[0 for i in range(self.board_size)] for i in range(self.board_size)]
+        self.possibleMoves = [i for i in range(self.board_size ** 2)]
+
+    def printBoard(self) -> None:
+        for row in self.boardArr:
+            for char in row:
+                print(char, end=" ")
+            print()
+    
+    def getRows(self) -> list:
+        return self.boardArr
+    
+    def getColumns(self) -> list:
+        columns = [[] for i in range(self.board_size)]
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+                columns[j].append(self.boardArr[i][j])
+        return columns
+    
+    def getDiagonals(self) -> list:
+        n_1_inc = self.board_size + 1
+        n_2_inc = self.board_size - 1
+        n_1 = 0
+        n_2 = n_2_inc
+        diagonals = [[], []]
+        while n_1 < self.board_size ** 2 and n_2 < self.board_size ** 2:
+            n_1_x = n_1 // self.board_size
+            n_1_y = n_1 % self.board_size
+            n_2_x = n_2 // self.board_size
+            n_2_y = n_2 % self.board_size
+            diagonals[0].append(self.boardArr[n_1_x][n_1_y])
+            diagonals[1].append(self.boardArr[n_2_x][n_2_y])
+            n_1 += n_1_inc
+            n_2 += n_2_inc
+        return diagonals
+    
+    def checkSubset(self, listOfLists: list) -> str | int:
+        same = True
+        checkChar = ""
+        for i in listOfLists:
+            if "B" in i:
+                continue
+            for j in range(len(i)):
+                if j == 0:
+                    checkChar = i[j]
+                elif i[j] != checkChar:
+                    same = False
+                    break
+            if same:
+                return checkChar
+        
+        return 0
+    
+    def checkBoard(self) -> str | int:
+        rowsChar = self.checkSubset(self.getRows())
+        columnsChar = self.checkSubset(self.getColumns())
+        diagonalsChar = self.checkSubset(self.getDiagonals())
+        if rowsChar == "X" or rowsChar == "O":
+            return rowsChar
+        elif columnsChar == "X" or columnsChar == "O":
+            return columnsChar
+        elif diagonalsChar == "X" or diagonalsChar == "O":
+            return diagonalsChar
+        return 0
+
+    def returnCenter(self) -> list:
+        center = []
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+                if i != 0 and j != 0 and i != self.board_size-1 and j != self.board_size-1:
+                    center.append(self.boardArr[i][j])
+        return center
+    
+    def addMove(self, pos: int, char: str) -> None:
+        self.boardArr[pos // self.board_size][pos % self.board_size] = char
+        self.possibleMoves.remove(pos)
+    
+    def getBoardSize(self):
+        return self.board_size
+class AI:
+    def __init__(self, board : Board, turnNum : int) -> None:
+        self.board = board
+        self.turnNum = turnNum
+        self.turnPiece = "X" if turnNum == 0 else "O"
+
+    def isWinningMove(self, row : int, col : int) -> bool: #check if the position is a win move
+        tempBoard = deepcopy(self.board)
+        tempBoard.addMove(row*self.board.board_size+col, self.turnPiece)
+        return tempBoard.checkBoard() == self.turnPiece #check for wins, either return True or False
+
+    def checkForForks(self, row : int, col : int) -> bool: #check if the position is a fork
+        tempBoard = deepcopy(self.board) #make a copy of Grid
+        tempBoard.addMove(row*self.board.board_size+col, self.turnPiece)
+        wins = 0 #keep track of how many win moves there are
+        
+        for i in self.board.possibleMoves:
+                check = self.isWinningMove(i // self.board.board_size, i % self.board.board_size) #check if each position is a potential winning move for temp
+
+                if check == True and self.board.boardArr == 0: #if so, and the position is empty:
+                    wins += 1 #mark it as a winning move by adding 1 to wins
+        
+        return wins >= 2
+
+    def getMove(self) -> int:
+        for i in self.board.possibleMoves:
+            if self.isWinningMove(i // self.board.board_size, i % self.board.board_size): #if the position is empty, and it is a winning move:
+                return i
+                
+        for k in self.board.possibleMoves:
+            if self.isWinningMove(k // self.board.board_size, k % self.board.board_size): #if the position is empty, and it is a winning move:
+                return k
+        
+        for m in self.board.possibleMoves:
+            if self.checkForForks(m // self.board.board_size, m % self.board.board_size): #if the position is empty, and it is a fork move:
+                return m
+                
+        for o in self.board.possibleMoves:
+            if self.checkForForks(o // self.board.board_size, o % self.board.board_size): #if the position is empty, and it is a winning move:
+                return o
+
+        center = self.board.returnCenter()
+        if len(center) == 1:
+            if 4 in self.board.possibleMoves: #first thing to check afterwards is center
+                return 4
+        else:
+            newAI = AI(center, self.turnNum)
+            if 0 in center:
+                return newAI.getMove()
+        
+        corners = [(0, 0), (0, self.board.board_size-1), (self.board.board_size-1, 0), (self.board.board_size-1, self.board.board_size-1)]
+        
+        randomCorner = choice(corners) #randomly choose a corner
+        if randomCorner[0]*self.board.board_size+randomCorner[1] in self.board.possibleMoves:
+            return randomCorner[0]*self.board.board_size+randomCorner[1]
+        else: #if the center and the corners are already full:
+            while True: #just randomly choose a possible item
+                row = randint(0, self.board.board_size)
+                col = randint(0, self.board.board_size)
+            
+                if row*self.board.board_size+col in self.board.possibleMoves:
+                    return row*self.board.board_size+col
 
 class TicTacToe():
     def __init__(self, client, window, clock):
