@@ -120,6 +120,12 @@ class Nim:
             self.removeStone(self.stones, self.stones.index(row))
             self.rowSelected = self.stones.index(row)
             self.mouse_pos = ()
+    
+    def checkExitClick(self, button):
+        if self.mouse_pos and button.x <= self.mouse_pos[0] <= button.x + button.size[0] and button.y <= self.mouse_pos[1] <= button.y + button.size[1]:
+            self.mouse_pos = ()
+            return True
+        return False
 
     def checkSubmitClick(self, button):
         if self.rowSelected != 10:
@@ -156,6 +162,8 @@ class Nim:
             pygame.draw.rect(self.window, (255, 255, 255), (440, 250, 120, 350))
             write(self.window, f'YOU {text}', 'tahoma.ttf', 40, 500, 300, color)
             self.dashboardButton.draw()
+            if self.checkExitClick(self.dashboardButton):
+                self.run = False
     
     # def loseScreen(self):
     #     self.turn = False
