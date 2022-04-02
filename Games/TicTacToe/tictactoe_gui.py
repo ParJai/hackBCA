@@ -186,8 +186,8 @@ class TicTacToe():
         player_1 = ''
 
         key_pressed = False
-        click_pos = ()
-        mouse_pos = ()
+        click_pos = (0, 0)
+        mouse_pos = (0, 0)
 
         one = ''
         two = ''
@@ -291,7 +291,7 @@ class TicTacToe():
             write('MULTIPLAYER', 'freesansbold.ttf', 35, vs_player.center, white)
             write('VS COMPUTER', 'freesansbold.ttf', 35, vs_computer.center, white)
 
-            if click_pos != ():
+            if click_pos != (0, 0):
                 if x_rect.collidepoint(click_pos):
                     player_1 = 'X'
                     pygame.draw.rect(screen, light_green, x_rect)
@@ -319,7 +319,7 @@ class TicTacToe():
 
                 if play_rect.collidepoint(click_pos):
                     if player_1 != '' and opponent != '':
-                        click_pos = ()
+                        click_pos = (0, 0)
                         game()
                         home_screen = False
                 elif quit_rect.collidepoint(click_pos):
@@ -368,7 +368,7 @@ class TicTacToe():
             if to_draw:
                 for marker in to_draw:
                     write(marker[0], marker[1], marker[2], marker[3], marker[4])
-            if click_pos != ():
+            if click_pos != (0, 0):
                 if not tie and not win:
                     if turn <= 9:
                         if opponent == "Computer":
@@ -516,7 +516,7 @@ class TicTacToe():
                                             nine = 'O'
                                             nine_filled = True
                                             turn += 1
-                            click_pos = ()
+                            click_pos = (0, 0)
                             check_win()
                             if not tie and not win:
                                 computerMove = computer.getMove()
@@ -746,7 +746,7 @@ class TicTacToe():
                                             nine_filled = True
                                             turn += 1
                                             move = 8
-                            click_pos = ()
+                            click_pos = (0, 0)
                             check_win()
                             self.client.messageQueue.append(str(move))
 
