@@ -10,10 +10,13 @@ f2 = open(sys.path[0]+'\\wordsSix.txt', 'r')
 SIXLIST = f2.read().split()
 
 class anagrams:
+    
     def __init__(self, window, clock):
         self.window = window
         self.clock = clock
         self.run = True
+        words = []
+        letters = []
 
         while(self.run):
             for event in pygame.event.get():
@@ -21,7 +24,7 @@ class anagrams:
                     self.run = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     pass
-            self.draw()
+            self.draw(letters, words)
 
     def write(self, screen, text, font, text_size, center, color):
         text_font = pygame.font.Font(font, text_size)
@@ -30,13 +33,15 @@ class anagrams:
         text_rect.center = center
         screen.blit(text_to_write, text_rect)
         
-    def draw(self, letters):
+    def draw(self, letters, words):
         self.window.fill((231, 173, 153))
         pygame.draw.rect(self.window, (255,255,255), (150, 0, 700, 600))
         self.write(self.window, "ANAGRAMS", "tahoma.ttf", 36, (500, 30), (203, 98, 23))
         for i in range (6):
-            #draw  m
-            
+            #draw each letter
+            pass
+
+
 
         pygame.display.flip()
 WIDTH = 1000
