@@ -50,6 +50,7 @@ class Nim:
         self.rowSelected = 10
         self.removed = 0
         self.submitTurnButton = Button(self.window, 410, 590, (180, 80), 'SUBMIT')
+        self.dashboardButton = Button(self.window, 420, 380, (160, 80), 'DASHBOARD')
         self.run = True
         self.turn = True
 
@@ -93,12 +94,12 @@ class Nim:
                     self.mouse_pos = ()
             
             self.draw()
-            self.checkWin(self.stones)
             if self.checkSubmitClick(self.submitTurnButton):
-                print()
                 self.client.messageQueue.append(f'{self.rowSelected};{self.removed}')
                 self.rowSelected, self.removed = 10, 0
                 self.turn = False
+            
+            self.endScreen()
 
     def draw(self):
         self.window.fill(self.bgColor)
@@ -142,11 +143,22 @@ class Nim:
         total = 0
         for row in stones:
             total += len(row)
-        return total == 0
+        if total == 0: return 'win'
+        elif total == 1: return 'lose'
+        return False
 
-    def winScreen(self):
-        self.turn = False
-        write(self.window, 'YOU WON', 'tahoma.ttf', 40, 500, 300, ((0, 255, 0)))
+    def endScreen(self):
+        isWin = self.checkWin(self.stones)
+        if isWin == 'win': text = 'WON'; color = (0, 255, 0)
+        elif isWin == 'lose': text = 'LOST'; color = (255, 0, 0)
+        if isWin:
+            self.turn = False
+            pygame.draw.rect(self.window, (255, 255, 255), (440, 250, 120, 350))
+            write(self.window, f'YOU {text}', 'tahoma.ttf', 40, 500, 300, color)
+            self.dashboardButton.draw()
     
-    def loseScreen(self):
-        self.turn = False
+    # def loseScreen(self):
+    #     self.turn = False
+    #     pygame.draw.rect(self.window, (255, 255, 255), (440, 250, 120, 350))
+    #     write(self.window, 'YOU LOST', 'tahoma.ttf', 40, 500, 300, ((255, 0, 0)))
+    #     self.dashboardButton.draw()
