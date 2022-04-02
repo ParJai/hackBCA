@@ -4,11 +4,11 @@ class circle:
     def __init__(self, x, y, window):
         self.x=x
         self.y=y
-        self.winodw = window
+        self.window = window
         self.color = (12, 50, 97)
 
     def draw(self):
-        pygame.draw.circle(self.winodw, self.color, (self.x, self.y), 30)
+        pygame.draw.circle(self.window, self.color, (self.x, self.y), 30)
 class Connect4:
     def __init__(self, window, clock):
         self.window = window
@@ -25,7 +25,7 @@ class Connect4:
 
         self.prevcol = -1
 
-        self.field = [["O" for i in range(8)] for j in range(9)];
+        self.field = [["O" for i in range(8)] for j in range(9)]
         self.player = self.newGame()
 
         self.loadCircles()
@@ -89,6 +89,8 @@ class Connect4:
         return (False)
 
     def nextTurn(self, player, column, row):
+        row += 1
+        column += 1
         if not player:
             self.field[column][row] = 'R'
         else:
@@ -97,6 +99,7 @@ class Connect4:
         return(not player)
     
     def placePiece(self, col):
+
         self.row = 7-(7-len(self.cols[col]))
         if not self.player:
             self.cols[col][0].color = (255,0,0)
@@ -105,6 +108,8 @@ class Connect4:
         del self.cols[col][0]
     
     def checkWin(self, row, col):
+        row+=1
+        col+=1
         numUp = 0
         numDown = 0
         numLeft = 0
