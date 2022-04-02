@@ -40,6 +40,7 @@ def nextTurn(player, column, row):
 
 def checkWins(row, column):
     return False
+    #kai will semd
 
 def main():
     player = newGame()
@@ -49,17 +50,17 @@ def main():
     win = False
 
     while (not win):
-        #input
+        inPlayer, row, col = jack input
 
-        while(not inputCheck(player, y, z) or inPlayer != player):
+        while(not inputCheck(player, row, col) or inPlayer != player):
             if inPlayer != player:
                 #send not your turn message
             else:
                 #send invalid move message
             #collect new inputs
 
-        player = nextTurn(player, y, z)
-        checkWins(y, z)
+        player = nextTurn(player, row, col)
+        checkWins(row, col)
 
 
 
