@@ -1,4 +1,3 @@
-
 import pygame
 import threading
 
@@ -20,7 +19,7 @@ class Button:
         self.y = y
         self.size = size
         self.text = text
-    
+
     def draw(self):
         mx, my = pygame.mouse.get_pos()
         pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
@@ -35,10 +34,10 @@ class Stone:
         self.row = row
         self.x, self.y = x, y
         self.size = size
-    
+
     def draw(self):
         pygame.draw.circle(self.window, (255, 255, 255), (self.x, self.y), self.size)
-    
+
 class Nim:
     def __init__(self, window, clock, client):
         self.window = window
@@ -52,6 +51,7 @@ class Nim:
         self.removed = 0
         self.submitTurnButton = Button(self.window, 410, 590, (180, 80), 'SUBMIT')
         self.run = True
+        self.turn = False
 
         self.bgColor = (74, 111, 165)
         margin = 40
@@ -79,39 +79,38 @@ class Nim:
                 self.stones[-1].append(Stone(self.window, row + 1, x, y, size))
 
         while self.run:
+            if len(self.client.recievingQueue) != 0:
+                self.updateBoard(self.client.recievingQueue[0][1].split(";")[0],self.client.recievingQueue[0][1].split(";")[1] )
+                print((self.client.recievingQueue[0][0], self.client.recievingQueue[0][1]))
+                del self.client.recievingQueue[0]
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    self.mouse_pos = pygame.mouse.get_pos()
+                    if self.turn: self.mouse_pos = pygame.mouse.get_pos()
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouse_pos = ()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_1:
-                        pass
-                    elif event.key == pygame.K_2:
-                        pass
-                    if event.key == pygame.K_3:
-                        pass
+            
             self.draw()
             self.checkWin(self.stones)
             if self.checkSubmitClick(self.submitTurnButton):
                 # print(self.checkWin(self.stones))
                 self.client.messageQueue.append(f'{self.rowSelected};{self.removed}')
                 self.rowSelected, self.removed = 10, 0
-    
+                self.turn = False
+
     def draw(self):
         self.window.fill(self.bgColor)
         for row in self.stones:
             for stone in row:
                 stone.draw()
-            print(self.rowSelected)
-            if self.rowSelected == 10:
-                self.checkStoneClick(row)
-                self.rowSelected = self.stones.index(row)
-            else:
-                if self.rowSelected == self.stones.index(row):
+            if self.turn:
+                if self.rowSelected == 10:
                     self.checkStoneClick(row)
+                else:
+                    if self.rowSelected == self.stones.index(row):
+                        self.checkStoneClick(row)
         self.submitTurnButton.draw()
         pygame.display.update()
 
@@ -120,7 +119,7 @@ class Nim:
             self.removeStone(self.stones, self.stones.index(row))
             self.rowSelected = self.stones.index(row)
             self.mouse_pos = ()
-    
+
     def checkSubmitClick(self, button):
         if self.mouse_pos and button.x <= self.mouse_pos[0] <= button.x + button.size[0] and button.y <= self.mouse_pos[1] <= button.y + button.size[1]:
             self.mouse_pos = ()
@@ -131,6 +130,13 @@ class Nim:
         stones[row].pop(-1)
         self.removed += 1
     
+    def updateBoard(self, row, removed):
+        row = int(row)
+        removed = int(removed)
+        for i in range(removed):
+            self.stones[row].pop(-1)
+        self.turn = True
+
     def checkWin(self, stones):
         total = 0
         for row in stones:
