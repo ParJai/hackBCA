@@ -28,9 +28,12 @@ class Hand:
         self.cards = []
         self.card_imageNames = []
         self.value = 0
+        self.aces = 0
 
     def add_card(self, card):
         self.cards.append(card)
+
+        if card[0] == 'ace':
 
     def calculate(self):
         ranks = [card[0] for card in self.cards]
@@ -59,10 +62,3 @@ class Hand:
 class Chips:
     def __init__(self):
         self.total = 100
-        self.bet = 0
-
-    def win_bet(self):
-        self.total += self.bet
-
-    def lose_bet(self):
-        self.total -= self.bet
