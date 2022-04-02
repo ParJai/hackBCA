@@ -40,13 +40,20 @@ class Client():
             try:
                 username_header = self.client_socket.recv(self.HEADER).decode(self.FORMAT)
                 if username_header.split()[0] != 'userlist':
+                    print('1')
                     username_length = int(username_header.strip())
+                    print('2')
                     username = self.client_socket.recv(username_length).decode(self.FORMAT)
+                    print('3')
                     message_header = self.client_socket.recv(self.HEADER).decode(self.FORMAT)
+                    print('4')
                     message_length = int(message_header.strip())
+                    print('5')
                     message = self.client_socket.recv(message_length).decode(self.FORMAT)
+                    print(message)
                     self.recievingQueue.append([username, message])
                 else:
+                    print('10')
                     userListLen = int(username_header.split()[1].strip())
                     userList = self.client_socket.recv(userListLen).decode(self.FORMAT)
                     userList = userList.split(":")

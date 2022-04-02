@@ -48,10 +48,13 @@ def checkValidGame(game, conn):
         if len(tempAGMgame) < games[game]-1:
             agm.append([])
             tempAGMgame.append(conn)
+            print('player joined')
+            print(tempAGMgame)
+            print(agm)
             return agm[-1]
         else:
             tempAGMgame.append(agm)
-            agm[-1] == tempAGMgame
+            agm[-1] = tempAGMgame
             tempAGMgame=[]
             return agm[-1]
     elif game == 'bts':
@@ -102,11 +105,20 @@ def handle_client(conn, addr):
     
     gameList = checkValidGame(game['data'], conn)
     
+    message = msg.encode(FORMAT)
+    msg_length = len(message)
+    send_length = str(msg_length).encode(FORMAT)
+    send_length += b' ' * (HEADER - len(send_length))
+    client_socket.send(send_length)
+    if len(gameList) == 1:
+        conn.send("1")
+    else:
+        conn.send("2")
+    
     sockets_list.append(conn)
     ignoreDisconnected = []
     connected = True
     while connected:
-        if len(gameList) != 0:
             try:
                 msg_len = conn.recv(HEADER).decode(FORMAT)
                 if msg_len: 
@@ -115,6 +127,7 @@ def handle_client(conn, addr):
                     print(msg)
                     if msg != "": 
                         print(msg, "message")
+                        print(gameList)
                         for client_socket in gameList:
                             if client_socket != conn:
                                 try:
