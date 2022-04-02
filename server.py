@@ -116,10 +116,10 @@ def handle_client(conn, addr):
                     print(msg)
                     if msg != nstring: 
                         print(msg, "message")
-                        for client_socket in clients:
+                        for client_socket in gameList:
                             if client_socket != conn:
                                 try:
-                                    clients[client_socket].append(f"{user['header']:<{HEADER}}:{user['data']}:{msg_len:<{HEADER}}:{msg}")
+                                    clients[client_socket].append(f"{game['header']:<{HEADER}}:{game['data']}:{msg_len:<{HEADER}}:{msg}")
                                     split_msg = clients[client_socket][0].split(":")
                                     client_socket.send(split_msg[0].encode(FORMAT))
                                     client_socket.send(split_msg[1].encode(FORMAT))
