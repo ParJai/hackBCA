@@ -1,194 +1,268 @@
-# main.py
+# Blackjack Card Game
+# I like to play blackjack using cards. I'm not addicted to gambling. I'm addicted to sitting in a semi-circle.
+# So I have impelmented "Black Jack" game in Python using Code Skulptor Tool.
+# To know more about Black Jack go to this link:  http://en.wikipedia.org/wiki/Blackjack
 
 import random
-import pydealer
-from time import sleep
+
+# load card sprite - 949x392 - source: jfitz.com
+from PySimpleGUI import PySimpleGUI
+
+CARD_SIZE = (73, 98)
+CARD_CENTER = (36.5, 49)
+card_images = PySimpleGUI.Image("http://commondatastorage.googleapis.com/codeskulptor-assets/cards.jfitz.png")
+
+CARD_BACK_SIZE = (71, 96)
+CARD_BACK_CENTER = (35.5, 48)
+card_back = PySimpleGUI.Image("http://commondatastorage.googleapis.com/codeskulptor-assets/card_back.png")
+
+# initialize some useful global variables
+
+in_play = False
+outcome = ""
+score = 0
+cover = 1
+
+# define globals for cards
+
+SUITS = ('Clubs', 'S', 'H', 'D')
+RANKS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K')
+VALUES = {'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'T': 10, 'J': 10, 'Q': 10, 'K': 10}
 
 
-def welcome():
-    print(
-        "Welcome to the game of Blackjack! In this game, you will be dealt two cards to start. Your goal is to get as close to 21 as possible without going over - or busting! In this game, Jack, Queen, and King are worth 10 and the Ace is worth 1 or 11 (you get to choose).")
+# define card class
 
-    print(
-        "\nThe dealer will first ask you to hit (take another card) or stay. As long as you don't bust, once you decide to stay, the dealer will then play his hand. The dealer always has to hit until his hand is at least 17. Whoever has the better hand (the hand that is closer to 21) at the end wins!")
+class Card:
 
-    start = input("\nPress any key to start playing. ")
+    def __init__(self, suit, rank):
 
-    main()
+        if (suit in SUITS) and (rank in RANKS):
 
-
-def main():
-    deck = []
-
-    for i in range(8):
-        for j in range(2, 11):
-            deck.append(j)
-            deck.append("Jack")
-            deck.append("Queen")
-            deck.append("King")
-            deck.append("Ace")
-
-    first = random.choice(deck)
-    second = random.choice(deck)
-    hand = [first, second]
-    total = 0
-    counter = 0
-
-    if "Ace" in hand and "Queen" in hand:
-        print(f"\nHere is your hand: {hand}")
-        print("\nBlackjack! You win!")
-        end()
-
-    if "Ace" in hand and "King" in hand:
-        print(f"\nHere is your hand: {hand}")
-        print("\nBlackjack! You win!")
-        end()
-
-    if "Ace" in hand and "Jack" in hand:
-        print(f"\nHere is your hand: {hand}")
-        print("\nBlackjack! You win!")
-        end()
-
-    if "Ace" in hand and 10 in hand:
-        print(f"\nHere is your hand: {hand}")
-        print("\nBlackjack! You win!")
-        end()
-
-    for element in hand:
-        if element == 'Queen' or element == 'Jack' or element == 'King':
-            total += 10
-
-        elif element == 'Ace':
-            if counter == 0:
-                print(f"\nHere is your hand: {hand}")
-                sleep(2)
-            A = input("You have an Ace! Choose its value (1 or 11): ")
-            total += int(A)
-            counter += 1
+            self.suit = suit
+            self.rank = rank
 
         else:
-            total += element
 
-    while True:
-        sleep(1)
-        print(f"\n\n\nHere is your new hand: {hand}")
+            self.suit = None
+            self.rank = None
+            print
+            "Invalid card: ", suit, rank
 
-        sleep(1.5)
-        print(f"Your current value is {total}")
+    def __str__(self):
 
-        choice = input("\nType in H to hit or S to stay: ")
+        return self.suit + self.rank
 
-        if choice == 'H':
-            another = random.choice(deck)
-            hand.append(another)
+    def get_suit(self):
 
-            if another == 'Queen' or another == 'Jack' or another == 'King':
-                total += 10
+        return self.suit
 
-            elif another == 'Ace':
-                sleep(2)
-                print(f"\nYour new hand is {hand}")
-                sleep(1)
-                choice_ace = input("\nYou have an Ace! Choose its value (1 or 11): ")
-                total += int(choice_ace)
+    def get_rank(self):
 
-            else:
-                total += another
+        return self.rank
 
-        elif choice == 'S':
-            break
+    def draw(self, canvas, pos):
 
-        if total > 21:
-            sleep(1.5)
-            print(f"\nYour new hand is {hand}")
-            sleep(1)
-            print("\nOh no, you busted! :(")
-            end()
-
-    print("\n\nDealer's Turn!")
-
-    deal_first = random.choice(deck)
-    deal_second = random.choice(deck)
-    deal_hand = [deal_first, deal_second]
-    deal_total = 0
-
-    for element in deal_hand:
-        if element == 'Queen' or element == 'Jack' or element == 'King':
-            deal_total += 10
-
-        elif element == "Ace":
-            choosing = [1, 11]
-            deal_total += random.choice(choosing)
-
-        else:
-            deal_total += element
-
-    while True:
-        sleep(1.5)
-        print(f"\nHere is the dealer's new hand: {deal_hand}")
-
-        if deal_total == 21 and len(deal_hand) == 2:
-            sleep(1)
-            print("Blackjack! Dealer wins!")
-            end()
-
-        sleep(2)
-        print(f"\nThe value of the dealer's cards is {deal_total}")
-
-        if deal_total < 17:
-            deal_another = random.choice(deck)
-            deal_hand.append(deal_another)
-
-            if deal_another == 'Queen' or deal_another == 'Jack' or deal_another == 'King':
-                deal_total += 10
-
-            elif deal_another == 'Ace':
-                deal_total += random.choice(choosing)
-
-            else:
-                deal_total += deal_another
-
-        elif deal_total > 21:
-            sleep(2)
-            print("\nThe dealer busted. You win!")
-            end()
-
-        else:
-            sleep(3)
-            print(f"\nThe dealer has finalized their hand.")
-            break
-
-    if total > deal_total:
-        sleep(2)
-        print("\nYou had the better hand. You win! :)")
-
-    elif total == deal_total:
-        sleep(2)
-        print("\nYou pushed (tied).")
-
-    elif total < deal_total:
-        sleep(2)
-        print("\nThe dealer had the better hand. You lost :(")
-
-    end()
+        card_loc = (CARD_CENTER[0] + CARD_SIZE[0] * RANKS.index(self.rank),
+                    CARD_CENTER[1] + CARD_SIZE[1] * SUITS.index(self.suit))
+        canvas.draw_image(card_images, card_loc, CARD_SIZE, [pos[0] + CARD_CENTER[0], pos[1] + CARD_CENTER[1]],
+                          CARD_SIZE)
 
 
-def end():
-    sleep(2.5)
-    play_again = input("\n\nPress a key to play again, or press q to quit. ")
+# define hand class
 
-    if play_again != 'q':
-        main()
+class Hand:
+
+    def __init__(self):
+
+        self.cards = []
+
+    def __str__(self):
+
+        s = "Cards in hand: "
+
+        for i in self.cards:
+            s = s + str(i) + " "
+
+        return s
+
+    def add_card(self, card):
+
+        self.cards.append(card)
+
+    def get_value(self):
+
+        value = 0
+        isAcePresent = False
+
+        for i in self.cards:
+
+            value = value + VALUES[i.get_rank()]
+
+            if value == 1:
+                isAcePresent = True
+
+        if (isAcePresent) and ((value + 10) <= 21):
+            value = value + 10
+
+        return value
+
+    def draw(self, canvas, pos):
+
+        j = 0
+
+        for i in self.cards:
+            i.draw(canvas, [(pos[0] + (j * 80)), pos[1]])
+            j = j + 1
+
+
+# define deck class
+
+class Deck:
+
+    def __init__(self):
+
+        self.cards = []
+
+        for suit in SUITS:
+
+            for rank in RANKS:
+                self.cards.append(Card(suit, rank))
+
+    def shuffle(self):
+
+        random.shuffle(self.cards)
+
+    def deal_card(self):
+
+        return self.cards.pop()
+
+    def __str__(self):
+
+        s = "Cards in deck: "
+
+        for i in self.cards:
+            s = s + str(i) + " "
+
+        return s
+
+
+# define event handlers for buttons
+
+def deal():
+    global outcome, in_play, score, card, deck, hand, dealer, cover
+
+    if in_play:
+        in_play = False
+        outcome = "You lose! New deal?"
+        cover = 0
+        score = score - 1
 
     else:
-        exit(1)
+        new_deck = Deck()
+        new_hand = Hand()
+        new_dealer = Hand()
+
+        deck = new_deck
+        hand = new_hand
+        dealer = new_dealer
+
+        deck.shuffle()
+
+        hand.add_card(deck.deal_card())
+        hand.add_card(deck.deal_card())
+
+        dealer.add_card(deck.deal_card())
+        dealer.add_card(deck.deal_card())
+
+        cover = 1
+        outcome = "Hit or stand?"
+        in_play = True
 
 
-welcome()
+def hit():
+    global outcome, in_play, score, card, deck, hand, dealer, cover
+
+    if in_play:
+
+        card = deck.deal_card()
+        hand.add_card(card)
+
+        if hand.get_value() > 21:
+            in_play = False
+            outcome = "Busted! You lose! New deal?"
+            cover = 0
+            score = score - 1
 
 
+def stand():
+    global outcome, in_play, score, card, deck, hand, dealer, cover
+
+    if in_play:
+
+        cover = 0
+
+        while dealer.get_value() < 17:
+            card = deck.deal_card()
+            dealer.add_card(card)
+
+        if dealer.get_value() > 21:
+
+            outcome = "You win! New deal?"
+            in_play = False
+            score = score + 1
+
+        else:
+
+            if dealer.get_value() >= hand.get_value():
+
+                outcome = "You lose! New deal?"
+                in_play = False
+                score = score - 1
+
+            else:
+
+                outcome = "You win! New deal?"
+                in_play = False
+                score = score + 1
 
 
+# draw handler
+
+def draw(canvas):
+    global outcome, in_play, score, card, deck, hand, dealer, cover
+
+    canvas.draw_text("Blackjack", (210, 70), 48, 'Black')
+    canvas.draw_text("Score: " + str(score), (250, 110), 32, 'Black')
+    canvas.draw_text("Dealer:", (250, 180), 32, 'Black')
+    canvas.draw_text("Player:", (250, 390), 32, 'Black')
+    dealer.draw(canvas, [100, 210])
+    hand.draw(canvas, [100, 420])
+    canvas.draw_text(outcome, (150, 560), 32, 'Black')
+
+    if cover == 1:
+        canvas.draw_image(card_back, CARD_BACK_CENTER, CARD_BACK_SIZE, [136.5, 259], CARD_SIZE)
 
 
+# initialize frame
 
+frame = PySimpleGUI.Frame("Blackjack", 600, 600)
+frame.set_canvas_background("Orange")
+
+# initialize data
+
+card = Card("S", "A")
+deck = Deck()
+hand = Hand()
+dealer = Hand()
+
+# create buttons and canvas callback
+
+frame.add_button("Deal", deal, 200)
+frame.add_button("Hit", hit, 200)
+frame.add_button("Stand", stand, 200)
+frame.set_draw_handler(draw)
+
+# get things rolling
+
+deal()
+frame.start()
