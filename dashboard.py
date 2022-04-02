@@ -34,7 +34,6 @@ class Dashboard:
         self.navColor = (40, 0, 3)
 
         self.gameNames = os.listdir('Games')
-        self.gameNames += ['Anagrams', 'Battleship', 'Nim', 'Blackjack']
         self.images = {}
         self.games = []
         # self.images[self.gameNames[i]]
