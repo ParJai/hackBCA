@@ -154,7 +154,7 @@ class Nim:
         if isWin:
             self.turn = False
             pygame.draw.rect(self.window, (255, 255, 255), (440, 250, 120, 350))
-            write(self.window, f'YOU {text}', 'tahoma.ttf', 40, 500, 300, color)
+            write(self.window, f'YOU {text}', 'tahoma.ttf', 40, (500, 300), color)
             self.dashboardButton.draw()
     
     # def loseScreen(self):
