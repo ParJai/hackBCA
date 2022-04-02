@@ -86,6 +86,13 @@ class Nim:
                     self.mouse_pos = pygame.mouse.get_pos()
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouse_pos = ()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_1:
+                        pass
+                    elif event.key == pygame.K_2:
+                        pass
+                    if event.key == pygame.K_3:
+                        pass
             self.draw()
             self.checkWin(self.stones)
             if self.checkSubmitClick(self.submitTurnButton):
