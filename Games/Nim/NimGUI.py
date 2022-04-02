@@ -25,7 +25,7 @@ class Button:
         mx, my = pygame.mouse.get_pos()
         pygame.draw.rect(self.window, (219, 223, 172), (self.x, self.y, self.size[0], self.size[1]), 0, 3)
         write(self.window, self.text, 'tahoma.ttf', 40, ((self.x + (self.size[0] / 2), self.y + (self.size[1] / 2))), (0, 0, 0))
-        if self.x <= mx <= self.x + self.size[0] and self.y <= my <= self.y + self.size[1]:
+        if self.x <= pygame.mouse.get_pos()[0] <= self.x + self.size[0] and self.y <= pygame.mouse.get_pos()[1] <= self.y + self.size[1]:
             pygame.draw.rect(self.window, (255, 255, 255), ((self.x - 5), (self.y - 5), self.size[0] + 5, self.size[1] + 5), 4)
 
 
@@ -98,7 +98,8 @@ class Nim:
         for row in self.stones:
             for stone in row:
                 stone.draw()
-            if self.rowSelected != 10:
+            print(self.rowSelected)
+            if self.rowSelected == 10:
                 self.checkStoneClick(row)
                 self.rowSelected = self.stones.index(row)
             else:
@@ -110,6 +111,7 @@ class Nim:
     def checkStoneClick(self, row):
         if self.mouse_pos and (len(row) != 0) and (row[0].x - row[0].size) <= self.mouse_pos[0] <= (row[-1].x + row[0].size) and (row[0].y - row[0].size) <= self.mouse_pos[1] <= (row[-1].y + row[0].size):
             self.removeStone(self.stones, self.stones.index(row))
+            self.rowSelected = self.stones.index(row)
             self.mouse_pos = ()
     
     def checkSubmitClick(self, button):
