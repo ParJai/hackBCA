@@ -4,6 +4,7 @@ from Games.Nim.NimGUI import Nim
 from dashboard import Dashboard
 from tempclient import TempClient
 from Games.Nim.NimGUI import Nim
+from Games.TicTacToe.tictactoe_gui import *
 from Games.Connect_Four.c4GUI import Connect4
 
 SCREEN_WIDTH = 1000

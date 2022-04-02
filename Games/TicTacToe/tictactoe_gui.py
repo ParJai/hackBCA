@@ -1,12 +1,164 @@
 import pygame
-from AI import AI
-from Board import Board
+import threading
+from copy import deepcopy
+from random import choice, randint
+
+class Board:
+    def __init__(self, board_size: int) -> None:
+        self.board_size = board_size
+        self.boardArr = [[0 for i in range(self.board_size)] for i in range(self.board_size)]
+        self.possibleMoves = [i for i in range(self.board_size ** 2)]
+
+    def printBoard(self) -> None:
+        for row in self.boardArr:
+            for char in row:
+                print(char, end=" ")
+            print()
+    
+    def getRows(self) -> list:
+        return self.boardArr
+    
+    def getColumns(self) -> list:
+        columns = [[] for i in range(self.board_size)]
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+                columns[j].append(self.boardArr[i][j])
+        return columns
+    
+    def getDiagonals(self) -> list:
+        n_1_inc = self.board_size + 1
+        n_2_inc = self.board_size - 1
+        n_1 = 0
+        n_2 = n_2_inc
+        diagonals = [[], []]
+        while n_1 < self.board_size ** 2 and n_2 < self.board_size ** 2:
+            n_1_x = n_1 // self.board_size
+            n_1_y = n_1 % self.board_size
+            n_2_x = n_2 // self.board_size
+            n_2_y = n_2 % self.board_size
+            diagonals[0].append(self.boardArr[n_1_x][n_1_y])
+            diagonals[1].append(self.boardArr[n_2_x][n_2_y])
+            n_1 += n_1_inc
+            n_2 += n_2_inc
+        return diagonals
+    
+    def checkSubset(self, listOfLists: list):
+        same = True
+        checkChar = ""
+        for i in listOfLists:
+            if "B" in i:
+                continue
+            for j in range(len(i)):
+                if j == 0:
+                    checkChar = i[j]
+                elif i[j] != checkChar:
+                    same = False
+                    break
+            if same:
+                return checkChar
+        
+        return 0
+    
+    def checkBoard(self):
+        rowsChar = self.checkSubset(self.getRows())
+        columnsChar = self.checkSubset(self.getColumns())
+        diagonalsChar = self.checkSubset(self.getDiagonals())
+        if rowsChar == "X" or rowsChar == "O":
+            return rowsChar
+        elif columnsChar == "X" or columnsChar == "O":
+            return columnsChar
+        elif diagonalsChar == "X" or diagonalsChar == "O":
+            return diagonalsChar
+        return 0
+
+    def returnCenter(self) -> list:
+        center = []
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+                if i != 0 and j != 0 and i != self.board_size-1 and j != self.board_size-1:
+                    center.append(self.boardArr[i][j])
+        return center
+    
+    def addMove(self, pos: int, char: str) -> None:
+        self.boardArr[pos // self.board_size][pos % self.board_size] = char
+        self.possibleMoves.remove(pos)
+    
+    def getBoardSize(self):
+        return self.board_size
+class AI:
+    def __init__(self, board : Board, turnNum : int) -> None:
+        self.board = board
+        self.turnNum = turnNum
+        self.turnPiece = "X" if turnNum == 0 else "O"
+
+    def isWinningMove(self, row : int, col : int) -> bool: #check if the position is a win move
+        tempBoard = deepcopy(self.board)
+        tempBoard.addMove(row*self.board.board_size+col, self.turnPiece)
+        return tempBoard.checkBoard() == self.turnPiece #check for wins, either return True or False
+
+    def checkForForks(self, row : int, col : int) -> bool: #check if the position is a fork
+        tempBoard = deepcopy(self.board) #make a copy of Grid
+        tempBoard.addMove(row*self.board.board_size+col, self.turnPiece)
+        wins = 0 #keep track of how many win moves there are
+        
+        for i in self.board.possibleMoves:
+                check = self.isWinningMove(i // self.board.board_size, i % self.board.board_size) #check if each position is a potential winning move for temp
+
+                if check == True and self.board.boardArr == 0: #if so, and the position is empty:
+                    wins += 1 #mark it as a winning move by adding 1 to wins
+        
+        return wins >= 2
+
+    def getMove(self) -> int:
+        for i in self.board.possibleMoves:
+            if self.isWinningMove(i // self.board.board_size, i % self.board.board_size): #if the position is empty, and it is a winning move:
+                return i
+                
+        for k in self.board.possibleMoves:
+            if self.isWinningMove(k // self.board.board_size, k % self.board.board_size): #if the position is empty, and it is a winning move:
+                return k
+        
+        for m in self.board.possibleMoves:
+            if self.checkForForks(m // self.board.board_size, m % self.board.board_size): #if the position is empty, and it is a fork move:
+                return m
+                
+        for o in self.board.possibleMoves:
+            if self.checkForForks(o // self.board.board_size, o % self.board.board_size): #if the position is empty, and it is a winning move:
+                return o
+
+        center = self.board.returnCenter()
+        if len(center) == 1:
+            if 4 in self.board.possibleMoves: #first thing to check afterwards is center
+                return 4
+        else:
+            newAI = AI(center, self.turnNum)
+            if 0 in center:
+                return newAI.getMove()
+        
+        corners = [(0, 0), (0, self.board.board_size-1), (self.board.board_size-1, 0), (self.board.board_size-1, self.board.board_size-1)]
+        
+        randomCorner = choice(corners) #randomly choose a corner
+        if randomCorner[0]*self.board.board_size+randomCorner[1] in self.board.possibleMoves:
+            return randomCorner[0]*self.board.board_size+randomCorner[1]
+        else: #if the center and the corners are already full:
+            while True: #just randomly choose a possible item
+                row = randint(0, self.board.board_size)
+                col = randint(0, self.board.board_size)
+            
+                if row*self.board.board_size+col in self.board.possibleMoves:
+                    return row*self.board.board_size+col
 
 class TicTacToe():
-    def __init__(self, client, window, clock):
+    def __init__(self, window, clock, client):
         self.client = client
         self.window = window
         self.clock = clock
+        msg = ""
+        sending = threading.Thread(target = self.client.send_message, args = (msg,), daemon = True)
+        sending.start()
+        recieving = threading.Thread(target = self.client.recieve_message, args = (), daemon = True)
+        recieving.start()
+        self.runGame()
     
     def runGame(self):
         pygame.init()
@@ -17,10 +169,7 @@ class TicTacToe():
         red = (255, 0, 0)
         teal = (0, 128, 128)
         light_green = (124, 252, 0)
-
-        size = (1000, 700)
-        screen = pygame.display.set_mode(size)
-        pygame.display.set_caption('Tic-Tac-Toe')
+        screen = self.window
 
         x_rect = pygame.Rect((275+100, round(365*7/8)), (100, round(100*7/8)))
         o_rect = pygame.Rect((425+100, round(365*7/8)), (100, round(100*7/8)))
@@ -37,8 +186,8 @@ class TicTacToe():
         player_1 = ''
 
         key_pressed = False
-        click_pos = ()
-        mouse_pos = ()
+        click_pos = (0, 0)
+        mouse_pos = (0, 0)
 
         one = ''
         two = ''
@@ -142,7 +291,7 @@ class TicTacToe():
             write('MULTIPLAYER', 'freesansbold.ttf', 35, vs_player.center, white)
             write('VS COMPUTER', 'freesansbold.ttf', 35, vs_computer.center, white)
 
-            if click_pos != ():
+            if click_pos != (0, 0):
                 if x_rect.collidepoint(click_pos):
                     player_1 = 'X'
                     pygame.draw.rect(screen, light_green, x_rect)
@@ -170,7 +319,7 @@ class TicTacToe():
 
                 if play_rect.collidepoint(click_pos):
                     if player_1 != '' and opponent != '':
-                        click_pos = ()
+                        click_pos = (0, 0)
                         game()
                         home_screen = False
                 elif quit_rect.collidepoint(click_pos):
@@ -219,7 +368,7 @@ class TicTacToe():
             if to_draw:
                 for marker in to_draw:
                     write(marker[0], marker[1], marker[2], marker[3], marker[4])
-            if click_pos != ():
+            if click_pos != (0, 0):
                 if not tie and not win:
                     if turn <= 9:
                         if opponent == "Computer":
@@ -367,7 +516,7 @@ class TicTacToe():
                                             nine = 'O'
                                             nine_filled = True
                                             turn += 1
-                            click_pos = ()
+                            click_pos = (0, 0)
                             check_win()
                             if not tie and not win:
                                 computerMove = computer.getMove()
@@ -440,164 +589,235 @@ class TicTacToe():
                                     if player_1 == 'X':
                                         if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_1.center, blue))
+                                            board.addMove(0, "X")
                                             one = 'X'
-                                        else:
-                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_1.center, red))
-                                            one = 'O'
+                                            one_filled = True
+                                            turn += 1
+                                            move = 0
                                     else:
-                                        if player_1_x[turn] == 'O':
+                                        if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_1.center, blue))
-                                            one = 'X'
-                                        else:
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_1.center, red))
+                                            board.addMove(0, "O")
                                             one = 'O'
-                                    one_filled = True
-                                    turn += 1
+                                            one_filled = True
+                                            turn += 1
+                                            move = 0
                             elif tile_2.collidepoint(click_pos):
                                 if not two_filled:
                                     if player_1 == 'X':
                                         if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_2.center, blue))
+                                            board.addMove(1, "X")
                                             two = 'X'
-                                        else:
-                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_2.center, red))
-                                            two = 'O'
+                                            two_filled = True
+                                            turn += 1
+                                            move = 1
                                     else:
-                                        if player_1_x[turn] == 'O':
+                                        if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_2.center, blue))
-                                            two = 'X'
-                                        else:
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_2.center, red))
+                                            board.addMove(1, "O")
                                             two = 'O'
-                                    two_filled = True
-                                    turn += 1
+                                            two_filled = True
+                                            turn += 1
+                                            move = 1
                             elif tile_3.collidepoint(click_pos):
                                 if not three_filled:
                                     if player_1 == 'X':
                                         if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_3.center, blue))
+                                            board.addMove(2, "X")
                                             three = 'X'
-                                        else:
-                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_3.center, red))
-                                            three = 'O'
+                                            three_filled = True
+                                            turn += 1
+                                            move = 2
                                     else:
-                                        if player_1_x[turn] == 'O':
+                                        if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_3.center, blue))
-                                            three = 'X'
-                                        else:
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_3.center, red))
+                                            board.addMove(2, "O")
                                             three = 'O'
-                                    three_filled = True
-                                    turn += 1
+                                            three_filled = True
+                                            turn += 1
+                                            move = 2
                             elif tile_4.collidepoint(click_pos):
                                 if not four_filled:
                                     if player_1 == 'X':
                                         if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_4.center, blue))
+                                            board.addMove(3, "X")
                                             four = 'X'
-                                        else:
-                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_4.center, red))
-                                            four = 'O'
+                                            four_filled = True
+                                            turn += 1
+                                            move = 3
                                     else:
-                                        if player_1_x[turn] == 'O':
+                                        if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_4.center, blue))
-                                            four = 'X'
-                                        else:
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_4.center, red))
+                                            board.addMove(3, "O")
                                             four = 'O'
-                                    four_filled = True
-                                    turn += 1
+                                            four_filled = True
+                                            turn += 1
+                                            move = 3
                             elif tile_5.collidepoint(click_pos):
                                 if not five_filled:
                                     if player_1 == 'X':
                                         if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_5.center, blue))
+                                            board.addMove(4, "X")
                                             five = 'X'
-                                        else:
-                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_5.center, red))
-                                            five = 'O'
+                                            five_filled = True
+                                            turn += 1
+                                            move = 4
                                     else:
-                                        if player_1_x[turn] == 'O':
+                                        if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_5.center, blue))
-                                            five = 'X'
-                                        else:
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_5.center, red))
+                                            board.addMove(4, "O")
                                             five = 'O'
-                                    five_filled = True
-                                    turn += 1
+                                            five_filled = True
+                                            turn += 1
+                                            move = 4
                             elif tile_6.collidepoint(click_pos):
                                 if not six_filled:
                                     if player_1 == 'X':
                                         if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_6.center, blue))
+                                            board.addMove(5, "X")
                                             six = 'X'
-                                        else:
-                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_6.center, red))
-                                            six = 'O'
+                                            six_filled = True
+                                            turn += 1
+                                            move = 5
                                     else:
-                                        if player_1_x[turn] == 'O':
+                                        if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_6.center, blue))
-                                            six = 'X'
-                                        else:
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_6.center, red))
+                                            board.addMove(5, "O")
                                             six = 'O'
-                                    six_filled = True
-                                    turn += 1
+                                            six_filled = True
+                                            turn += 1
+                                            move = 5
                             elif tile_7.collidepoint(click_pos):
                                 if not seven_filled:
                                     if player_1 == 'X':
                                         if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_7.center, blue))
+                                            board.addMove(6, "X")
                                             seven = 'X'
-                                        else:
-                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_7.center, red))
-                                            seven = 'O'
+                                            seven_filled = True
+                                            turn += 1
+                                            move = 6
                                     else:
-                                        if player_1_x[turn] == 'O':
+                                        if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_7.center, blue))
-                                            seven = 'X'
-                                        else:
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_7.center, red))
+                                            board.addMove(6, "O")
                                             seven = 'O'
-                                    seven_filled = True
-                                    turn += 1
+                                            seven_filled = True
+                                            turn += 1
+                                            move = 6
                             elif tile_8.collidepoint(click_pos):
                                 if not eight_filled:
                                     if player_1 == 'X':
                                         if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_8.center, blue))
+                                            board.addMove(7, "X")
                                             eight = 'X'
-                                        else:
-                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_8.center, red))
-                                            eight = 'O'
+                                            eight_filled = True
+                                            turn += 1
+                                            move = 7
                                     else:
-                                        if player_1_x[turn] == 'O':
+                                        if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_8.center, blue))
-                                            eight = 'X'
-                                        else:
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_8.center, red))
+                                            board.addMove(7, "O")
                                             eight = 'O'
-                                    eight_filled = True
-                                    turn += 1
+                                            eight_filled = True
+                                            turn += 1
+                                            move = 7
                             elif tile_9.collidepoint(click_pos):
                                 if not nine_filled:
                                     if player_1 == 'X':
                                         if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_9.center, blue))
+                                            board.addMove(8, "X")
                                             nine = 'X'
-                                        else:
-                                            to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_9.center, red))
-                                            nine = 'O'
+                                            nine_filled = True
+                                            turn += 1
+                                            move = 8
                                     else:
-                                        if player_1_x[turn] == 'O':
+                                        if player_1_x[turn] == 'X':
                                             to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_9.center, blue))
-                                            nine = 'X'
-                                        else:
-                                            to_draw.append((player_1_o[turn], 'tahoma.ttf', 150, tile_9.center, red))
+                                            board.addMove(8, "O")
                                             nine = 'O'
-                                    nine_filled = True
-                                    turn += 1
-                            click_pos = ()
+                                            nine_filled = True
+                                            turn += 1
+                                            move = 8
+                            click_pos = (0, 0)
+                            check_win()
+                            self.client.messageQueue.append(str(move))
+                            if len(self.client.recievingQueue) != 0:
+                                if not tie and not win:
+                                    computerMove = self.client.recievingQueue[0][1]
+                                    if computerMove == 0:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_1.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(0, computerPiece)
+                                        one = computerPiece
+                                        one_filled = True
+                                        turn += 1
+                                    elif computerMove == 1:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_2.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(1, computerPiece)
+                                        two = computerPiece
+                                        two_filled = True
+                                        turn += 1
+                                    elif computerMove == 2:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_3.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(2, computerPiece)
+                                        three = computerPiece
+                                        three_filled = True
+                                        turn += 1
+                                    elif computerMove == 3:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_4.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(3, computerPiece)
+                                        four = computerPiece
+                                        four_filled = True
+                                        turn += 1
+                                    elif computerMove == 4:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_5.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(4, computerPiece)
+                                        five = computerPiece
+                                        five_filled = True
+                                        turn += 1
+                                    elif computerMove == 5:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_6.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(5, computerPiece)
+                                        six = computerPiece
+                                        six_filled = True
+                                        turn += 1
+                                    elif computerMove == 6:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_7.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(6, computerPiece)
+                                        seven = computerPiece
+                                        seven_filled = True
+                                        turn += 1
+                                    elif computerMove == 7:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_8.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(7, computerPiece)
+                                        eight = computerPiece
+                                        eight_filled = True
+                                        turn += 1
+                                    elif computerMove == 8:
+                                        to_draw.append((player_1_x[turn], 'tahoma.ttf', 150, tile_9.center, red))
+                                        computerPiece = "X" if player_1 == "O" else "O"
+                                        board.addMove(8, computerPiece)
+                                        nine = computerPiece
+                                        nine_filled = True
+                                        turn += 1
+                                del self.client.recievingQueue[0]
+                            check_win()
+
                 pygame.display.flip()
                 check_win()
 
@@ -804,7 +1024,3 @@ class TicTacToe():
                 tie_screen()
 
             pygame.display.flip()
-
-j = 0
-hi = TicTacToe(j, j, j)
-hi.runGame()
